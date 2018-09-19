@@ -31,6 +31,7 @@ export const isSVG = makeMap(
   true
 )
 
+// is-pre tag 元素
 export const isPreTag = (tag: ?string): boolean => tag === 'pre'
 
 export const isReservedTag = (tag: string): ?boolean => {

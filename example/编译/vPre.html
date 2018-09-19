@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <v-pre-child></v-pre-child>
+    </div>
+</body>
+<script type="text/x-template" id="v-pre-child">
+    <span class="child-root-1" v-if="testIf === 0">child-root-1</span>
+    <div class="child-root-2" v-else-if="testIf === 1">
+        <div class="nopre">child-root-2</div>
+        <div class="pre" v-pre>
+            <div :class="{'class1':value2 }">this is pre</div>
+            <div>{{value1}}</div>
+        </div>
+    </div>
+    <span class="child-root-3" v-else>child-root-3</span>
+</script>
+<script type="text/x-template" id="function-grandson">
+    <div>
+        <div>this is child</div>
+        <slot name="header"></slot>
+        <slot></slot>
+    </div>
+</script>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vPreChild = Vue.component('v-pre-child', {
+    
+    data: function() {
+        return {
+            testIf: 1,
+        }
+    },
+    template: '#v-pre-child'
+})
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    components: {
+        vPreChild
+    },
+    data: function() {
+        return {
+            arr: [{
+                id: 1,
+                name: 1
+            }, {
+                id: 2,
+                name: 2
+            }, {
+                id: 3,
+                name: 3
+            }],
+            
+            value1: 'value1',
+            value2: 'value2',
+            value3: 'value3',
+            value4: 'value4',
+        }
+    },
+
+})
+</script>
+
+</html>

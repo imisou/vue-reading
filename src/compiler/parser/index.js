@@ -60,6 +60,10 @@ export function createASTElement(
 
 /**
  * Convert HTML string to AST.
+ * 解析HTML -> AST对象
+ * 
+ * 
+ * 
  */
 export function parse(
     template: string,
@@ -67,6 +71,7 @@ export function parse(
 ): ASTElement | void {
     warn = options.warn || baseWarn
 
+    // 判断是否是 <pre></pre>元素
     platformIsPreTag = options.isPreTag || no
     platformMustUseProp = options.mustUseProp || no
     platformGetTagNamespace = options.getTagNamespace || no
@@ -106,6 +111,23 @@ export function parse(
         }
     }
 
+
+    /*
+    
+    <script type="text/x-template" id="v-pre-child">
+        <span class="child-root-1" v-if="testIf === 0">child-root-1</span>
+        <div class="child-root-2" v-else-if="testIf === 1">
+            <div class="nopre">child-root-2</div>
+            <div class="pre" v-pre>
+                <div :class="{'class1':value2 }">this is pre</div>
+                <div>{{value1}}</div>
+            </div>
+        </div>
+        <span class="child-root-3" v-else>child-root-3</span>
+    </script>
+
+
+     */
     parseHTML(template, {
         warn,
         expectHTML: options.expectHTML,
@@ -148,16 +170,23 @@ export function parse(
                 element = preTransforms[i](element, options) || element
             }
 
+            // 处理 v-pre 指令
+            // v-pre： 跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签。跳过大量没有指令的节点会加快编译。
             if (!inVPre) {
                 processPre(element)
+                // 如果element.pre = true; 代表此节点上存在 v-pre 指令 那么
                 if (element.pre) {
                     inVPre = true
                 }
             }
+            // 判断是否是 pre元素( 代码节点 )
+            // TODO: pre元素的作用  代码节点 其中也会包含<>等特殊的字符 我们把这些作为一个 静态文本静态处理
             if (platformIsPreTag(element.tag)) {
                 inPre = true
             }
+            // 判断该元素 上存在 v-pre指令  <div v-pre></div>
             if (inVPre) {
+                // 如果其存在v-pre 属性或者其父节点存在v-pre属性，那么此处处理其属性。
                 processRawAttrs(element)
             } else if (!element.processed) {
                 // structural directives
@@ -191,16 +220,21 @@ export function parse(
             }
 
             // tree management
+            // 当处理第一个节点的时候  
             if (!root) {
+                // 因为 root初始化的时候为 false; 所以此处 root = element;将当前节点作为根节点对象
+                // 但是vue 允许 根节点为 <div v-if> xxx </div> <div v-else-if>xx</div> <div v-else>xx</div>这种情况如何处理
                 root = element
                 // 根节点 不能为 <slot></slot> <template></template> 或者包含 v-for属性
                 checkRootConstraints(root)
             } else if (!stack.length) {
                 // allow root elements with v-if, v-else-if and v-else
-                // Vue中根节点只能存在一个 
-                // 但是如果我们几个根节点 是v-if v-else-if v-else 那么就支持
+                //  这边是处理 根节点中存在 <div v-if="xxx"></div><div v-else-if="xxx"></div><div v-else></div>的过程
+                // stack 是非闭合标签队列  对于子节点来说其肯定有一个父节点的非闭合标签，
+                // 如果stack.length === 0 且 root存在 那么此时这个节点肯定是 根节点的兄弟判断节点
                 if (root.if && (element.elseif || element.else)) {
                     checkRootConstraints(element)
+                    // 跟下面的currentParent处理一样 将此节点存放在 根v-if节点的ifConditions数组中
                     addIfCondition(root, {
                         exp: element.elseif,
                         block: element
@@ -213,40 +247,84 @@ export function parse(
                     )
                 }
             }
+
+            // 对于根节点 currentParent = undefined
+            // 对于子节点    currentParent = 父节点。
+            // 首先每一次遇到 没有闭合的标签 如 <div id="app"> <span class="span1"> 当处理span的时候其不是自闭和标签 那么currentParent = div
             if (currentParent && !element.forbidden) {
+                // 如果遇到 elseif 或者 else 那么此时 currentParent 要么就是 跟v-if的共同parent 要么就是undefined
                 if (element.elseif || element.else) {
+                    // 为什么 el.elseif 与 el.else 没有 最后的else 。就是在currentParent下 其浓缩在一个节点el上 (v-if),所以不需要插入
                     processIfConditions(element, currentParent)
                 } else if (element.slotScope) { // scoped slot
+                    // 同样对于 <slot></slot>这种节点元素其也只是一个插槽，不需要生成实际的节点
                     currentParent.plain = false
+                    // 插槽的默认名称 为default 
                     const name = element.slotTarget || '"default"';
+                    // 插槽的节点 存放在 parent.scopedSlots 属性上
+                    // TODO: 插槽 slot
                     (currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
                 } else {
+                    // 如上面 currentParent = div 那么此时就构成了 div>span 的树
                     currentParent.children.push(element)
+                    // span 的父节点  也就指向 div
                     element.parent = currentParent
                 }
             }
+            // 节点不是自闭和节点 
             if (!unary) {
+                // currentParent = element 那么下面处理的节点都是其子节点
                 currentParent = element
+                // 队列中 push 这个节点 等待后面找到 其闭合节点
                 stack.push(element)
             } else {
                 closeElement(element)
             }
         },
 
+        /*
+            <div id="app">
+                <span class="span1">span1</span>
+                <img src="xxxx">
+                <div class="no-span-div">
+                    <span>    
+                </div>
+            </div>
+
+            如上面的遇到第一个 闭合标签</span> 那么他就调用options.end()
+            此时 stack = [ el('div') , el('span')]
+         */
         end() {
             // remove trailing whitespace
+            // 获取 没有闭合标签栈 中的最后一个  如上面的 el('span')
             const element = stack[stack.length - 1]
+
+            // TODO: 待确认
             const lastNode = element.children[element.children.length - 1]
             if (lastNode && lastNode.type === 3 && lastNode.text === ' ' && !inPre) {
                 element.children.pop()
             }
+
             // pop stack
+            // stack 栈移除最后一个  stack = [ el('div') ]
             stack.length -= 1
+            // 在之前currentParent = 最后一个 没有闭合标签 ，此处如 el('span')
+            // 那么这时候span 已经找到了并且闭合了，那么下面处理的应该是stack 最后一个（el('div')）也就变成了当前处理的标签
             currentParent = stack[stack.length - 1]
             closeElement(element)
         },
 
+        /*
+            处理解析过程中遇到的文本内容
+         */
         chars(text: string) {
+            // 如果没有parent标签 那么说明根节点就是一个 文本
+            /*
+                FIXME:
+                template : 'xxxxxxxx',
+                template : 'text <div></div>'
+                这两种情况会报 组件根元素不能为一个文本
+             */
             if (!currentParent) {
                 if (process.env.NODE_ENV !== 'production') {
                     if (text === template) {
@@ -263,6 +341,7 @@ export function parse(
             }
             // IE textarea placeholder bug
             /* istanbul ignore if */
+            // 处理IE 中的  <textarea placeholder="文本">文本</textarea>
             if (isIE &&
                 currentParent.tag === 'textarea' &&
                 currentParent.attrsMap.placeholder === text
@@ -270,14 +349,20 @@ export function parse(
                 return
             }
             const children = currentParent.children
+            // 处理 <pre></pre> 期间的文本内容
             text = inPre || text.trim() ?
                 isTextTag(currentParent) ? text : decodeHTMLCached(text)
                 // only preserve whitespace if its not right after a starting tag
                 :
                 preserveWhitespace && children.length ? ' ' : ''
+
+            // 如果 存在文本
             if (text) {
                 let res
+                // 处理非 v-pre 指令下的文本节点
+                // 并通过parseText 解析文本 {{}} 使其转换成可执行的响应式文本
                 if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
+                    // 将需要进行响应式的文本节点存入children
                     children.push({
                         type: 2,
                         expression: res.expression,
@@ -285,6 +370,7 @@ export function parse(
                         text
                     })
                 } else if (text !== ' ' || !children.length || children[children.length - 1].text !== ' ') {
+                    // inVPre = true 那么就解析成 静态的文本节点
                     children.push({
                         type: 3,
                         text
@@ -303,16 +389,38 @@ export function parse(
     return root
 }
 
+
+/**
+ * 处理 v-pre 指令
+ *    跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签。跳过大量没有指令的节点会加快编译。
+ * @param {*} el 
+ */
 function processPre(el) {
+    // 判断该节点上是否存在静态属性 v-pre
     if (getAndRemoveAttr(el, 'v-pre') != null) {
         el.pre = true
     }
 }
 
+/**
+ * 处理 存在 v-pre 指令的节点及其子节点 的属性。
+ *    将所有的属性都作为静态属性 处理
+ *    如果是v-pre 的子节点 那么其应该不存在v-pre 属性
+ *    
+ *  <div class="pre" v-pre>
+        <div :class="{'class1':value2 }">this is pre</div>
+        <div>{{value1}}</div>
+    </div>
+ * @param {*} el 
+ */
 function processRawAttrs(el) {
+    // 获取元素的属性长度
     const l = el.attrsList.length
     if (l) {
+        //  初始化节点的 el.attrs 属性
         const attrs = el.attrs = new Array(l)
+
+        // 将所有的属性都作为静态属性处理
         for (let i = 0; i < l; i++) {
             attrs[i] = {
                 name: el.attrsList[i].name,
@@ -321,6 +429,8 @@ function processRawAttrs(el) {
         }
     } else if (!el.pre) {
         // non root node in pre blocks with no attributes
+        //  处理 上面 v-pre 的子节点  他们不存在v-pre 属性。
+        // 所以 添加一个el.plain = true;
         el.plain = true
     }
 }
@@ -486,9 +596,45 @@ function processIf(el) {
     }
 }
 
+/**
+ * 处理遇到 v-else-if  v-else 的节点  其parent要么就是 共同上级 ；要么就是undefined
+    <div id="app">
+        <div v-if='testIf === 0'>if</div>
+        <div v-else-if='testIf === 1'>v-else-if</div>
+        <div v-else>else</div>
+    </div>
+
+    #### 当我们遇到 <div v-else>else</div>  为什么 findPrevElement(parent.children) 查找的父节点最后一个元素节点仍然是 <div v-if='testIf === 0'>if</div> 而不是<div v-else-if='testIf === 1'>v-else-if</div>
+
+    在我们start() 的时候
+    if (element.elseif || element.else) {          
+        processIfConditions(element, currentParent)
+        ...
+    } else {
+        // 如上面 currentParent = div 那么此时就构成了 div>span 的树
+        currentParent.children.push(element)
+        // span 的父节点  也就指向 div
+        element.parent = currentParent
+    }
+    我们发现element.elseif || element.else 没有进行 currentParent.children.push(element) 
+    那就是说对于 v-if..else 3个节点来说其在AST上只是一个节点(v-if) 其其他节点 都存放在 el.ifConditions = [数组中]
+
+    el(v-if).ifConditions = [
+        { exp : 'testIf === 0' , block : el(v-if) } , 
+        { exp : 'testIf === 1' , block : el(v-else-if) } , 
+        { exp : undefined , block : el(v-else) }
+    ]
+ * @author guzhanghua
+ * @param {*} el
+ * @param {*} parent
+ */
 function processIfConditions(el, parent) {
+    // 找到当前节点的上一个兄弟节点，其肯定为此时他们父节点的最后一个元素子节点
+    // 当我们
     const prev = findPrevElement(parent.children)
+    // 判断元素子节点中是否存在 v-if
     if (prev && prev.if) {
+        // 如果存在 就在上一个兄弟节点的 el.ifConditions = []添加此条件
         addIfCondition(prev, {
             exp: el.elseif,
             block: el
@@ -501,11 +647,25 @@ function processIfConditions(el, parent) {
     }
 }
 
+/**
+ * 查找 当前v-else-if 或者 v-else的父级的子元素 
+ * 
+ * 其肯定是最后一个 元素类型节点
+ * @author guzhanghua
+ * @param {Array < any >} children
+ * @returns {(ASTElement | void)}
+ */
 function findPrevElement(children: Array < any > ) : ASTElement | void {
     let i = children.length
+    // 从后往前寻找
     while (i--) {
+        // 如果其为元素节点 那么就返回
         if (children[i].type === 1) {
             return children[i]
+
+        // 处理这种情况   <div>  <div v-if>xx</div>text <div v-else></div> </div>
+        // 中间穿插了text节点 那么就提示 不能包含文本节点
+        // 
         } else {
             if (process.env.NODE_ENV !== 'production' && children[i].text !== ' ') {
                 warn(
@@ -513,6 +673,7 @@ function findPrevElement(children: Array < any > ) : ASTElement | void {
                     `will be ignored.`
                 )
             }
+            // 但是 移除 继续寻找上一个
             children.pop()
         }
     }

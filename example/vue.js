@@ -5572,7 +5572,7 @@
             ownerArray,
             index
         ) {
-            debugger
+          
             if (isDef(vnode.elm) && isDef(ownerArray)) {
                 // This vnode was used in a previous render!
                 // now it's used as a new node, overwriting its elm would cause
@@ -8865,6 +8865,7 @@
         var index = 0;
         var last, lastTag;
         while (html) {
+
             last = html;
             // Make sure we're not in a plaintext content element like script/style
             if (!lastTag || !isPlainTextElement(lastTag)) {
@@ -9210,6 +9211,7 @@
             shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
             shouldKeepComment: options.comments,
             start: function start(tag, attrs, unary) {
+                
                 // check namespace.
                 // inherit parent ns if there is one
                 var ns = (currentParent && currentParent.ns) || platformGetTagNamespace(tag);
@@ -9317,6 +9319,7 @@
             },
 
             end: function end() {
+
                 // remove trailing whitespace
                 var element = stack[stack.length - 1];
                 var lastNode = element.children[element.children.length - 1];
@@ -9546,7 +9549,7 @@
 
     function processSlot(el) {
         if (el.tag === 'slot') {
-            debugger;
+        
             el.slotName = getBindingAttr(el, 'name');
             if ("development" !== 'production' && el.key) {
                 warn$2(
@@ -9609,7 +9612,7 @@
         var list = el.attrsList;
         var i, l, name, rawName, value, modifiers, isProp;
         for (i = 0, l = list.length; i < l; i++) {
-             debugger;
+        
             name = rawName = list[i].name;
             value = list[i].value;
             if (dirRE.test(name)) {
@@ -10900,6 +10903,7 @@
     ) {
 
         var ast = parse(template.trim(), options);
+        debugger;
         if (options.optimize !== false) {
             optimize(ast, options);
         }

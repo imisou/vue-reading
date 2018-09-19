@@ -69,6 +69,20 @@ function decodeAttr(value, shouldDecodeNewlines) {
 
 /**
  * 将html字符串转换成AST
+    <div id="app">
+        xxxx
+        <span class="span1">value : {{value2}} - {{value1}}。</span>
+        <img src="xxxx">
+        <div class="no-span-div">
+            <span>    
+        </div>
+    </div>
+
+
+
+
+
+
  * @param  {[type]} html    [字符串]"<div id="app"><button-counter></button-counter></div>"
  * @param  {[type]} options [配置对象]
  * @return {[type]}         [description]
@@ -133,9 +147,12 @@ export function parseHTML(html, options) {
                 }
 
                 // End tag:
+                // 处理结束标签   </div> </div:xx>
                 const endTagMatch = html.match(endTag)
                 if (endTagMatch) {
+                    // 移动当前的下标到  </div>的前面
                     const curIndex = index
+                    // 移动下标到 </div>结尾
                     advance(endTagMatch[0].length)
                     parseEndTag(endTagMatch[1], curIndex, index)
                     continue
@@ -154,8 +171,12 @@ export function parseHTML(html, options) {
             }
 
             let text, rest, next
+            // 如果 textEnd 大于0 那么说明 <div> .... 开始或者闭合标签跟上一个标签之间存在文本
+            // 此处为 xxxx
             if (textEnd >= 0) {
+                // 取出文本的内容
                 rest = html.slice(textEnd)
+
                 while (!endTag.test(rest) &&
                     !startTagOpen.test(rest) &&
                     !comment.test(rest) &&
@@ -170,12 +191,13 @@ export function parseHTML(html, options) {
                 text = html.substring(0, textEnd)
                 advance(textEnd)
             }
-
+            // 如果没有 < 那么后面的就全都是文本类型的
             if (textEnd < 0) {
                 text = html
                 html = ''
             }
 
+            // 在 上面的 如果遇到文本内容 那么就保存在text中 
             if (options.chars && text) {
                 options.chars(text)
             }
@@ -282,11 +304,35 @@ export function parseHTML(html, options) {
         // 元素是否为自闭和标签
         const unarySlash = match.unarySlash
 
+
         if (expectHTML) {
+            // FIXME: 处理特殊的情况  <p>元素中包含一些非法元素 <div></div> <h1></h1>.... </p>
+            /*
+                <p> 这是1 <div>this is div</div>xxxx</p>
+                在浏览器中渲染的结果为:
+                <p> 这是1 </p><div>this is div</div><p>xxxx</p>
+             */
+            // 如果我们上一个未闭合标签为p 且此标签是那些不能包含的非法标签如：<div></div>
             if (lastTag === 'p' && isNonPhrasingTag(tagName)) {
+                // 强制执行 闭合上一个未闭合标签 p元素
+                // <p> 这是1 </p><div>this is div</div>xxxx</p>
+                // 那么后面的那个 </p> 怎么处理 ？请看parseEndTag() pos < 0的情况
                 parseEndTag(lastTag)
             }
+
+            /*
+                <p>
+                    ppp
+                    <p>111111</p>
+                    pppp
+                </p>
+                浏览器渲染的结果一样为: 
+                <p>ppp</p>
+                <p>111111</p>
+                <p>pppp</p>
+             */
             if (canBeLeftOpenTag(tagName) && lastTag === tagName) {
+                // 强制前面没有闭合标签的元素闭合
                 parseEndTag(tagName)
             }
         }
@@ -328,17 +374,40 @@ export function parseHTML(html, options) {
         }
     }
 
+    /*
+        解析结束标签
+        <div> <span>xxxx </span></div> 
+        当我们遇到 </span>这个结束标签的时候，此时 tagName = span ; start = 16; end = 22
+
+        Vue 解析html的过程是这样的
+        <div> <span>xxxx </span> <img/> <input></div> 
+
+        如上面  先匹配遇到开始标签 <div> 其也不是自闭和标签 所以在栈中存一下 
+        stack = ['div'];
+        然后向下解析  需要 又遇到开始标签且不闭合 <span> ，那么
+        stack = [ div' , 'span' ];
+        然后继续 ，遇到闭合标签</span> 就运行到 parseEndTag() , 
+        然后从后向前 遍历 stack，发现 span === span 那么 pos = 1;
+        stack = ['div']  span处理了
+        继续：  遇到 img 发现其是自闭和标签 那么
+        继续：  需要input 发现其不是自闭和开始标签
+        stack = ['div' , 'input']
+        继续：  遇到闭合标签 </div>就运行到 parseEndTag() 然后 遍历 pos = 0 且发现
+    
+     */
     function parseEndTag(tagName, start, end) {
         let pos, lowerCasedTagName
         if (start == null) start = index
         if (end == null) end = index
 
+        // 将标签转小写
         if (tagName) {
             lowerCasedTagName = tagName.toLowerCase()
         }
 
         // Find the closest opened tag of the same type
         if (tagName) {
+            // 从后向前 遍历 stack，发现 span === span 那么 pos = 1;
             for (pos = stack.length - 1; pos >= 0; pos--) {
                 if (stack[pos].lowerCasedTag === lowerCasedTagName) {
                     break
@@ -348,9 +417,11 @@ export function parseHTML(html, options) {
             // If no tag name is provided, clean shop
             pos = 0
         }
-
+        //  发现 pos 大于0 说明在栈中找到了其开始标签
         if (pos >= 0) {
             // Close all the open elements, up the stack
+            //  如上面的 当 <div> <span>xxxx </span> <img/> <input></div>  解析到 </div>的时候 stack =  ['div' , 'input']
+            // 但是遍历 发现 pos = 0 那么 0到最后的都是没有闭合的标签，提示
             for (let i = stack.length - 1; i >= pos; i--) {
                 if (process.env.NODE_ENV !== 'production' &&
                     (i > pos || !tagName) &&
@@ -361,21 +432,39 @@ export function parseHTML(html, options) {
                     )
                 }
                 if (options.end) {
+                    // 调用 parse中的 end 方法
                     options.end(stack[i].tag, start, end)
                 }
             }
 
             // Remove the open elements from the stack
+            // 移除栈中 此时处理好的非闭合标签 如上面 
             stack.length = pos
             lastTag = pos && stack[pos - 1].tag
+        
+            // 下面是 在 stack = [ div' , 'span' ];中没有找到 跟此 结束标签相对应的开始标签
+            // 这个是处理 我们一个特殊的元素  </br> 这个元素可以直接结束而没有<br>这样的
+            // 所以我们找不到 <br>
         } else if (lowerCasedTagName === 'br') {
+            // 那么我们直接调用 start 去创建一个 开始标签
             if (options.start) {
                 options.start(tagName, [], true, start, end)
             }
+
+        /*
+            跟上面 </br>一样，此处是处理 没有开始标签的 </p>的情况
+            如上面我们在handleStartTag()  处理了一个特殊的情况 <p>x<div>x</div></p> p元素中包含非法的元素。
+            那么在handleStartTag()的处理 是在 <div>前 强制闭合 <p>x</p>元素，
+            那么就会造成 最后遗留一个 </p> 没有开始标签的p结束标签。
+         */
         } else if (lowerCasedTagName === 'p') {
+            // 发现 没有开始标签的结束标签名称为p
+            // 那么强制调用 start去创建一个开始标签
             if (options.start) {
+                // tagName === p
                 options.start(tagName, [], false, start, end)
             }
+            // 再执行 结束标签的 闭合过程
             if (options.end) {
                 options.end(tagName, start, end)
             }

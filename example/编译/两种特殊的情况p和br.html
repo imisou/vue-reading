@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- HTML5中规定了 p元素中不能包含一些元素  如div、h1.... -->
+        <!-- 详情请看 core/platforms/web/compiler/utils.js  isNonPhrasingTag属性 -->
+        <p>
+            xxxxxx
+            <div>divdiv</div>
+            xxxx
+        </p>
+        <!-- end:  其浏览器的结果是 : <p>xxxxxx</p><div>divdiv</div><p>xxxx</p>-->
+        </br>
+        <!-- 第二种情况是 </br>这种只有结束没有开始的标签 -->
+
+        <!-- 第三种:  -->
+        <p>ppp<p>111111</p>pppp</p>
+        <!-- 浏览器渲染的结果一样为 <p>ppp</p><p>111111</p><p>pppp</p> -->
+        <!-- 还有如 li ... 详情请看 core/platforms/web/compiler/utils.js  canBeLeftOpenTag属性 -->
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    data: function() {
+        return {
+            arr: [{
+                id: 1,
+                name: 1
+            }, {
+                id: 2,
+                name: 2
+            }, {
+                id: 3,
+                name: 3
+            }],
+            testIf: 1,
+            value1: 'value1',
+            value2: 'value2',
+            value3: 'value3',
+            value4: 'value4',
+        }
+    },
+
+})
+</script>
+
+</html>
