@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 自定义指令 -->
+       <div id="hook-arguments-example" v-demo:foo.a.b="message"></div> 
+       
+        <!-- 这是注释 节点 -->
+        <div :class="{'class1':value1}" :id="value2">非特殊处理的响应式属性</div>
+        <div v-zdy.name="xxx">xxx</div>
+        <div>{{value1}}</div>
+
+        <div> {{{{arr[0].name}} is {{arr[0].id}} </div>
+        <div>this is app</div>
+        <img src="//www.baidu.com/img/baidu_jgylogo3.gif"/>
+        <div class="class1" style='color:red'>1212</div>
+        <input type="text" name='name' readonly :class="{'name' : true}">
+
+        <!-- 看 processFor() parseFor() 源码 -->
+        <div v-for="(item,index,key) in arr" :key="item.id"></div>
+
+        <div v-if="testIf === '1'">if</div>
+        <div v-else-if="testIf === '2'">v-else-if</div>
+        <div v-else>else</div>
+
+        <div class="vOnce" v-once>{{testIf}}</div>
+
+        <div :key="value1">key</div>
+        <div v-bind:key="value2">v-bind:key</div>
+
+        <slot name="header"></slot>    
+    </div>
+</body>
+<script type="text/x-template" id="function-child">
+    <div>
+        <div>this is child</div>
+        <slot name="header"></slot>
+        <slot></slot>
+    </div>
+</script>
+<script type="text/x-template" id="function-grandson">
+    <div>
+        <div>this is child</div>
+        <slot name="header"></slot>
+        <slot></slot>
+    </div>
+</script>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    data: function() {
+        return {
+            arr : [{
+                id : 1,
+                name : 1
+            },{
+                id : 2,
+                name : 2
+            },{
+                id : 3,
+                name : 3
+            }],
+            testIf: 1,
+            value1: 'value1',
+            value2: 'value2',
+            value3: 'value3',
+            value4: 'value4',
+        }
+    },
+    
+})
+</script>
+
+</html>

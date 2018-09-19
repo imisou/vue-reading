@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>发布订阅者模式</title>
+</head>
+<body>
+
+</body>
+<script>
+
+  var publishId = 0;
+
+  // 发布者
+  var Publish = function (name) {
+    this.name = name;
+    this.id = observerId ++;
+  }
+
+
+  //保存了此发布者下 订阅的所有订阅者 对象
+  Publish.prototype.observers = [];
+
+  // 添加一个新的订阅者
+  Publish.prototype.addObserver = function (observer) {
+    if (!this.observers.concat(observer)) {
+      this.observers.push(observer);
+    }
+  }
+  // 添加删除订阅者的方法
+  Publish.prototype.removeObserver = function (observer) {
+    return this.observers.splice(this.observers.indexOf(observer), 1);
+  }
+  // 给订阅了此发布者的所有订阅者 发送一条消息
+  Publish.prototype.removeObserver = function (message) {
+    this.observers.forEach(observer => {
+      observer.update(Publish, message);
+    })
+  }
+
+  // 订阅者
+  var Observer = function (name) {
+    this.name = name;
+    this.newPublishIds = [];   // 保存了此订阅者订阅的所有发布者的id
+    this.newPublishs = [];     // 保存了此订阅者订阅的所有发布者
+
+  }
+  //todo 这是任务列表
+  Observer.prototype.update = function (publish, message) {
+    return `${publish.name} 发布了一条消息 ： 内容为： ${message}`
+  }
+  // 这里存在的一个问题是：
+  //  一般应该是订阅者去订阅 一个发布者  所以应该是 observer 存在一个 订阅 Publish的方法
+  //  但是上面的实现  是发布者去添加一个订阅者
+  //  那么如何改造上面的实现方式
+
+  Publish.target = null;  //我们在Publish上添加一个 静态属性 用于保存当前处理的 Observer 对象
+
+  Publish.prototype.depend = function () {
+      if(Publish.target){
+        Publish.target.addDep(this)
+      }
+  }
+
+
+
+  Observer.prototype.addDep = function (publish) {
+      //每一个 订阅者都有一个 唯一的id 当
+      var id = publish.id;
+      if(this.newPublishIds.indexOf(id) === -1){
+          this.newPublishIds.push(id);
+          this.newPublishs.push(publish);
+          publish.addObserver(this)
+      }
+  }
+
+  Publish.prototype.addObserver = function (observer) {
+    this.observers.push(observer);
+  }
+
+
+  var zs = new Observer('张三')
+  var xinhua = new Publish('新华报社');
+
+  Publish.target = zs;
+  if (Publish.target) {
+    xinhua.depend()
+  }
+
+
+</script>
+</html>

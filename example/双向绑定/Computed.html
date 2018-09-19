@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- <span ref="name">{{name}}</span> -->
+        <span ref="getName">{{getName}}</span>
+        <!-- <button @click="changeName">修改</button> -->
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    el: "#app",
+    // data: function() {
+    //     return {
+    //         name: "old name",
+    //     }
+    // },
+    computed:{
+        getName:function(){
+            return ' is Computed;'
+            // return this.name + ' is Computed;'
+        }
+    },
+     methods: {
+        changeName() {
+            this.name =  Math.random() + ' name';
+        }
+    }
+})
+</script>
+
+</html>

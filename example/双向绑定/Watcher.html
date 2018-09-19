@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Watcher</title>
+</head>
+
+<body>
+    <div id="app">
+        <span ref="getName">name</span>
+        <button @click="change">change</button>
+        <button @click="changeLast">change Last name</button>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    el: "#app",
+    data: function() {
+        return {
+            firstName : 'Gu',
+            lastName : 'zhanghua',
+            useLess : 0,
+            nested : {
+                a :{
+                    b : 1
+                }
+            }
+        }
+    },
+    computed:{
+        name:function(){
+            if(this.useLess > 0){
+                return this.firstName + ' ' + this.lastName;
+            }
+            return 'please click change'
+        }
+    },
+    watch:{
+        useLess : function(newVal){
+            console.log('useLess : '+ newVal);
+        },
+        name:{
+            immediate: true,
+            handler:function(newVal){
+                console.log('name is : '+ newVal);
+            }
+        },
+        nested:{
+            deep:true,
+            // sync:true,
+            handler:function(newVal){
+                console.log('nested is : '+ newVal.a.b);
+            }
+        }
+    },
+     methods: {
+        change:function() {
+            this.useLess ++ ;
+            this.nested.a.b = 2;
+        },
+        changeLase : function(){
+            this.lastName = 'zhang'
+        }
+    }
+})
+</script>
+
+</html>

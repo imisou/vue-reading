@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" name="" id="input">
+        <div></div>
+        <div id="name">{{name}}</div>
+    </div>
+</body>
+<script type="text/javascript" src="./Dep.js"></script>
+<script type="text/javascript" src="./Watcher.js"></script>
+<script type="text/javascript" src="./Observer.js"></script>
+<script type="text/javascript">
+
+
+function observe(value){
+    if(value.hasOwnProperty("__ob__")){
+        return ;
+    }
+    var ob = new Observer(value);
+}
+function Vue(obj){
+    var _self = this;
+    this.data = obj.data;
+  
+    observe( this.data);
+
+    new Watcher(this,'name',function(value){
+        document.getElementById("name").innerHTML = value
+    })
+    document.getElementById('input').addEventListener('change',function(e){
+         _self.data.name = e.target.value;
+         
+    })
+}
+
+new Vue({
+    data: {
+        name: '',
+        arr : [1,2,3]
+    }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+</html>

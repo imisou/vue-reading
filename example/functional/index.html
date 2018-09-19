@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>this is app</div>
+        <scope-first>
+            <template slot="header">
+                <div class="app-header">
+                    this is header
+                </div>
+            </template>
+            <div class="app-body">
+                this is body
+
+            </div>
+        </scope-first>
+    </div>
+</body>
+<script type="text/x-template" id="function-child">
+    <div>
+        <div>this is child</div>
+        <slot name="header"></slot>
+        <slot></slot>
+    </div>
+</script>
+<script type="text/x-template" id="function-grandson">
+    <div>
+        <div>this is child</div>
+        <slot name="header"></slot>
+        <slot></slot>
+    </div>
+</script>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var scopeFirst = Vue.component('scope-first', {
+    functional: true,
+    props:{
+
+    },
+    data: function() {
+        return {
+            count: 0
+        }
+    },
+    render:function(createElement,context){
+        debugger;
+        console.log(context)
+        console.log(context.appMethods)
+        return createElement('div',{
+            class:'child-div'
+        },[
+            createElement('div',{},'this is child'),
+            createElement('div',{}, context.count)
+        ])
+    }
+})
+
+
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    components: {
+        scopeFirst
+    },
+    data: function() {
+        return {
+
+        }
+    },
+    methods: {
+        appMethods:function(){
+
+        }
+    }
+})
+</script>
+
+</html>

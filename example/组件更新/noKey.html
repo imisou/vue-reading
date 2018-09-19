@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- <ul v-if="isShow">
+            <li class="class1">11111</li>
+        </ul>
+        <ul v-else>
+             <li class="class1" :class="{'class2' : isShowClass}">22222</li>         
+        </ul> -->
+        <input type="text"  name="" v-if="isShow">
+        <input type="textarea"  name="" v-else>
+        <button @click="addCounter">addCounter</button>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+
+    data: function() {
+        return {
+            isShow : true,
+            isShowClass: true
+        }
+    },
+    methods: {
+        addCounter: function() {
+            this.isShow = this.isShowClass = false;
+        }
+    }
+})
+</script>
+
+</html>

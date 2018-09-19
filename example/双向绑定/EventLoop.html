@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <style type="text/css">
+    .box {
+        display: inline-block;
+        height: 100px;
+        width: 100px;
+        border: 1px solid red;
+    }
+
+    .box1 {
+        width: 200px;
+        height: 200px;
+        background-color: #efefef;
+    }
+
+    .box2 {
+
+        background-color: blue;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="box box1">
+        <div class="box box2"></div>
+    </div>
+</body>
+<script type="text/javascript">
+// JS 是 单线程的 
+// 
+// 任务队列中任务分为 micro task 和 macro task
+// micro task : Promise , MutationObserver process.nextTick();
+// macro task : setTimeout() 、 setInterval() 、 setImmediate() 、 I/O 、 UI rendering
+// 在同一个队列中 micro 会在macro之前执行
+
+// console.log(1);
+// setTimeout(function() {
+//     console.log(3);
+// }, 0);
+// new Promise(function(resolve, reject) {
+//     console.log(4);
+//     resolve();
+// }).then(function() {
+//     console.log(5);
+// }).then(function() {
+//     console.log(6);
+// })
+// console.log(2);
+
+// // 1 4 2 5 6 3
+
+// console.log(1);
+// setTimeout(function() {
+//     console.log(3);
+// }, 0);
+// new Promise(function(resolve, reject) {
+//     console.log(4);
+//     resolve();
+// }).then(function() {
+//     new Promise(function(resolve, reject) {
+//         console.log(7);
+//         resolve();
+//     }).then(function() {
+//         console.log(8);
+//     })
+//     console.log(5);
+// }).then(function() {
+//     console.log(6);
+// })
+// console.log(2);
+// // 1 4 2 7 5 8 6 3
+
+
+// 栗子3
+var innerBox = document.querySelector('.box2');
+var outerBox = document.querySelector('.box1');
+
+
+// new MutationObserver(function() {
+//     console.log('mutation')
+// }).observe(outerBox, {
+//     attributes: true
+// })
+
+
+function onClick(e) {
+    console.log(this.name + ' is click');
+    setTimeout(function() {
+        console.log(3);
+    }, 0);
+    new Promise(function(resolve, reject) {
+        console.log(4);
+        resolve();
+    }).then(function() {
+        console.log(5);
+    }).then(function() {
+        console.log(6);
+    })
+}
+
+innerBox.addEventListener('click',onClick.bind({name:'innerBox'}));
+outerBox.addEventListener('click',onClick.bind({name:'outerBox'}));
+
+
+// innerBox is click 4 5 6
+// outerBox is click 4 5 6
+// 3 3
+// 
+// 先执行主进程代码 输出  innerBox is click 4
+// 将macro task 任务推入 macro队列 即 输出3
+// 将micro task 任务退出 micro队列 即 输出5，输出6
+// 将U/I事件 即时间冒泡推入 macro队列
+// 因为 micro 先执行  所以 输出  5 6
+// 然后冒泡执行 父主进程 输出  outerBox is click 4
+// 将macro task 任务推入 macro队列 即 输出3
+// 将micro task 任务退出 micro队列 即 输出5，输出6
+// 因为 micro 先执行  所以 输出  5 6
+// 没有 micro 进程了 所以 处理 macro 进程 输出 3 3
+</script>
+
+</html>

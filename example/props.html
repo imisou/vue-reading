@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <button-counter name-key="name-key" ></button-counter>
+    </div>
+</body>
+<script type="text/javascript" src="./vue.js"></script>
+<script type="text/javascript">
+var buttonCounter = Vue.component('button-counter', {
+    props: {
+        name: [String],
+        nameKey: {
+            type: [Boolean,String]
+        }
+    },
+    data: function() {
+        return {
+            count: 0
+        }
+    },
+    template: '<button v-on:click="count++">You clicked me {{ count }} {{nameKey}} times.</button>',
+    mounted: function() {
+        console.log(this);
+    }
+})
+var vue = new Vue({
+    el: "#app",
+    components: {
+        buttonCounter
+    },
+    data: function() {
+        return {
+            name: ""
+        }
+    },
+    beforeCreate() {
+
+    },
+    mounted:function(){
+        
+    }
+})
+</script>
+
+</html>

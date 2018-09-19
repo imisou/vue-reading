@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <span ref="name">{{name}}</span>
+        <button @click="changeName">修改</button>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    el: "#app",
+    data: function() {
+        return {
+            name: "old name",
+        }
+    },
+    methods: {
+        changeName() {
+            // this.name = 'change value';
+            // console.log('sync is ' + this.$refs.name.innerText);
+            // this.$nextTick(_ => {
+            //     console.log('nextTick is ' + this.$refs.name.innerText);
+            // })
+            // this.$nextTick().then( _ => {
+            //     console.log('nextTick Promise is ' + this.$refs.name.innerText);
+            // })
+            // // 输出的结果为：
+            // // sync is old name
+            // // nextTick is change value
+            // // nextTick Promise is change value
+            // // 可见nextTick是在按照顺序先回调或者promise的先执行
+            
+
+
+
+            this.$nextTick(_ => {
+                console.log('nextTick1 is ' + this.$refs.name.innerText);
+            })
+            this.name = 'change value';
+            console.log('sync is ' + this.$refs.name.innerText);
+
+            this.$nextTick().then(_ => {
+                console.log('nextTick2 Promise is ' + this.$refs.name.innerText);
+            })
+            // 输出的结果为：
+            // sync is old name
+            // nextTick is old name
+            // nextTick Promise is change value
+            // 1. nextTick 是在下一个tick执行 所以永远在同步输出之后 nextTick is old name 在 sync is old name之后执行
+            // 2. 我们this.name 触发事件派发此时 更新DOM 也是一个nextTick回调，
+            // 所以在队列中 this.name更新DOM 是在  nextTick1 之后 所以 nextTick1 输出为原来的旧值 old name
+        }
+    }
+})
+</script>
+
+</html>

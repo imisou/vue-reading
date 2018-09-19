@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+
+    </div>
+</body>
+<script src="../vue.js"></script>
+<script>
+    Vue.mixin({
+        created:function () {
+            console.log('this is mixin created')
+        },
+        template: '<div>{{msg}}</div>'
+    })
+
+    var vue = new Vue({
+        el:"#app",
+        mixins:[{
+            created:function () {
+                console.log('this is inline mixin created');
+            }
+        }],
+        data:function () {
+            return {
+                msg: 'vue msg'
+            }
+        },
+        created:function () {
+            console.log('this is app created')
+        }
+    })
+
+    // 最后的输出结果为
+    // this is mixin created
+    // this is inline mixin created
+    // this is inline app created
+</script>
+</html>
