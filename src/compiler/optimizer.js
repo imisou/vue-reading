@@ -28,7 +28,7 @@ export function optimize(root: ? ASTElement, options : CompilerOptions) {
     isPlatformReservedTag = options.isReservedTag || no
     // first pass: mark all non-static nodes.
     // 标记节点是否是静态节点
-    markStatic(root)
+    7markStatic(root)
     // second pass: mark static roots.
     // 标记节点是否是静态根节点
     markStaticRoots(root, false)
@@ -69,8 +69,9 @@ function markStatic(node: ASTNode) {
         }
         for (let i = 0, l = node.children.length; i < l; i++) {
             const child = node.children[i]
-                // 循环处理子节点 如果发现一个子节点不是静态子节点 那么此节点就不是静态节点
+            // 循环处理子节点 如果发现一个子节点不是静态子节点 那么此节点就不是静态节点
             markStatic(child)
+            // 如果发现一个子节点不是静态节点 那么此节点就不是静态节点
             if (!child.static) {
                 node.static = false
             }
@@ -93,17 +94,30 @@ function markStatic(node: ASTNode) {
 
 /**
  * 标记节点是否是静态根节点
+ *   哪些是静态根节点？
+ *   1、存在子节点(子节点不是单个文本节点)的静态节点就是 静态根节点。
+ *   2、v-if.v-else-if v-else 三种节点是 存放在v-if节点的 node.ifConditions属性下，而不是我们正常的node.children属性。
+ *      所以我们也需要根据 条件1 去判断其 其他节点是否是静态根节点
  * @param {*} node 
  * @param {*} isInFor 
  */
 function markStaticRoots(node: ASTNode, isInFor: boolean) {
+    // 只有元素节点 才可能是静态根节点
     if (node.type === 1) {
+        // 如果父节点 存在 node.for (是循环节点)
+        // 那么如果子节点存在 static 或者 once 那么此子节点 staticInFor = true
         if (node.static || node.once) {
             node.staticInFor = isInFor
         }
         // For a node to qualify as a static root, it should have children that
         // are not just static text. Otherwise the cost of hoisting out will
         // outweigh the benefits and it's better off to just always render it fresh.
+        /*
+            存在子节点(子节点不是单个文本节点)的静态节点就是 静态根节点。
+            node.static && node.children.length 判断需要存在子节点。
+            node.children.length === 1 && node.children[0].type === 3 解决的是这种 
+            元素节点下只包含一个文本节点(<div>xxxxx</div>) 的元素节点 不值得去 标记其为静态根节点
+         */
         if (node.static && node.children.length && !(
                 node.children.length === 1 &&
                 node.children[0].type === 3
@@ -118,6 +132,7 @@ function markStaticRoots(node: ASTNode, isInFor: boolean) {
                 markStaticRoots(node.children[i], isInFor || !!node.for)
             }
         }
+        // 同样处理 v-if v-else-if
         if (node.ifConditions) {
             for (let i = 1, l = node.ifConditions.length; i < l; i++) {
                 markStaticRoots(node.ifConditions[i].block, isInFor)
@@ -140,11 +155,12 @@ function isStatic(node: ASTNode): boolean {
         return true
     }
 
-    // v-pre 节点肯定是静态节点
-    // node.hasBindings = true 
-    // node.if 、 node.for 存在
-    // <slot></slot> <component></component>
-    // 
+    /*
+        1、 v-pre 节点肯定是静态节点
+        2、 节点 都不是这些 ：hasBinding : false , 没有 node.if , 且没有node.for , 
+            tag不是内置标签 slot、component标签 , 且元素是平台标签(div、span...) , 
+            除了 上面的 type,tag,attrsList,attrsMap,plain,parent,children,attrs 没有其他属性
+     */
     return !!(node.pre || (!node.hasBindings && // no dynamic bindings
         !node.if && !node.for && // not v-if or v-for or v-else
         !isBuiltInTag(node.tag) && // not a built-in

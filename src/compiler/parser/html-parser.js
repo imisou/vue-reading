@@ -78,11 +78,6 @@ function decodeAttr(value, shouldDecodeNewlines) {
         </div>
     </div>
 
-
-
-
-
-
  * @param  {[type]} html    [字符串]"<div id="app"><button-counter></button-counter></div>"
  * @param  {[type]} options [配置对象]
  * @return {[type]}         [description]
@@ -332,7 +327,7 @@ export function parseHTML(html, options) {
                 <p>pppp</p>
              */
             if (canBeLeftOpenTag(tagName) && lastTag === tagName) {
-                // 强制前面没有闭合标签的元素闭合
+                // 强制前面没有闭合标签的元素闭合<p>ppp
                 parseEndTag(tagName)
             }
         }

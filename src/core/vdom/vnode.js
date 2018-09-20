@@ -196,6 +196,11 @@ export default class VNode {
     }
 }
 
+/**
+ * 创建一个 空的 vnode 的方法
+ *  如我们 编译后 render()  中 _v('')就是调用此方法 去创建一个空的VNode
+ * @param {*} text 
+ */
 export const createEmptyVNode = (text: string = '') => {
     const node = new VNode()
     node.text = text
@@ -203,6 +208,10 @@ export const createEmptyVNode = (text: string = '') => {
     return node
 }
 
+/**
+ * 创建一个文本VNode
+ * @param {*} val 
+ */
 export function createTextVNode(val: string | number) {
     return new VNode(undefined, undefined, undefined, String(val))
 }

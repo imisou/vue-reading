@@ -23,7 +23,9 @@ export function installRenderHelpers (target: any) {
   target._f = resolveFilter
   target._k = checkKeyCodes
   target._b = bindObjectProps
+  // 创建一个文本vnode
   target._v = createTextVNode
+  // 创建一个空的vnode
   target._e = createEmptyVNode
   target._u = resolveScopedSlots
   target._g = bindObjectListeners

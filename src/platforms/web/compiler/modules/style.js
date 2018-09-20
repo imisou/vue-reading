@@ -40,6 +40,21 @@ function transformNode(el: ASTElement, options: CompilerOptions) {
     }
 }
 
+
+/**
+ * 用于 codegen 的时候将 AST 的style相关属性转换成表达式
+ <li style="color:red;" :class="{'font-size:10px;': item.id === 1}">
+    {{item.name}} is ad
+ </li>
+ 其
+ el = {
+    staticStyle : '"color:red;"'
+    style : "{'font-size:10px;': item.id === 1}"
+ }
+
+ 转成 "staticStyle:"color:red;",style:{'font-size:10px;': item.id === 1},"
+ * @param {*} el 
+ */
 function genData(el: ASTElement): string {
     let data = ''
     if (el.staticStyle) {

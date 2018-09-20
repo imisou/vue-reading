@@ -54,6 +54,10 @@ export function initRender(vm: Component) {
 
 export function renderMixin(Vue: Class < Component > ) {
     // install runtime convenience helpers
+    // 主要用安装运行时，编译后组件 依赖的一些方法 
+    /*
+        with(this){_c('div',{},[_e()])}
+     */
     installRenderHelpers(Vue.prototype)
 
     Vue.prototype.$nextTick = function(fn: Function) {

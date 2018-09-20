@@ -81,6 +81,8 @@ export const createCompiler = createCompilerCreator(function baseCompile(
     if (options.optimize !== false) {
         optimize(ast, options)
     }
+
+    // codegen 把AST树转换成 代码执行字符串
     const code = generate(ast, options)
 
 

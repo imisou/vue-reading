@@ -38,6 +38,21 @@ function transformNode(el: ASTElement, options: CompilerOptions) {
     }
 }
 
+/**
+ * 用于 codegen 的时候将 AST 的class相关属性转换成表达式
+ <li class="liclass" :class="{'liclass': item.id === 1}">
+    {{item.name}} is ad
+ </li>
+ 其
+ el = {
+    staticClass : '"liclass"'
+    class : "{'liclass': item.id === 1}"
+ }
+
+ 转成 "staticClass:"liclass",class:{'liclass': item.id === 1},"
+
+ * @param {*} el 
+ */
 function genData(el: ASTElement): string {
     let data = ''
     if (el.staticClass) {

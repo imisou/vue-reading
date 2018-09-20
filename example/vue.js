@@ -10907,7 +10907,9 @@
         if (options.optimize !== false) {
             optimize(ast, options);
         }
+        debugger;
         var code = generate(ast, options);
+        debugger;
         return {
             ast: ast,
             render: code.render,

@@ -4,13 +4,15 @@ import { extend, warn, isObject } from 'core/util/index'
 
 /**
  * Runtime helper for rendering <slot>
+ * 处理运行期间的 <slot ></slot>
  */
 export function renderSlot (
-  name: string,
-  fallback: ?Array<VNode>,
-  props: ?Object,
-  bindObject: ?Object
+  name: string,                    // 插槽的名称   default
+  fallback: ?Array<VNode>,         // 插槽的子节点 render函数  [_c('span',[_v("slot name")])]
+  props: ?Object,                  // slot节点上的响应式属性
+  bindObject: ?Object              // slot节点上 v-bind 指令绑定的属性
 ): ?Array<VNode> {
+  // 获取当前
   const scopedSlotFn = this.$scopedSlots[name]
   let nodes
   if (scopedSlotFn) { // scoped slot

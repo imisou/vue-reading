@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <button-counter>
+            <div class="app" slot-scope="scope">
+                <div slot>xxxxx</div>
+            </div>    
+        </button-counter>
+    </div>
+</body>
+<script type="text/javascript" src="../../vue.js"></script>
+<script type="text/javascript">
+var buttonCounter = Vue.component('button-counter', {
+   
+    data: function() {
+        return {
+            count: 0
+        }
+    },
+    template: `<div>
+        <div>this is button</div>
+        <slot :id="count" v-bind="count" class="button-counter">
+            <span>slot name</span>
+        </slot>    
+    </div>`,
+    mounted: function() {
+        console.log(this);
+    }
+})
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    components: {
+        buttonCounter
+    },
+    data: function() {
+        return {
+
+            value4: 'value4',
+        }
+    },
+
+})
+</script>
+
+</html>
