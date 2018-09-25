@@ -333,12 +333,15 @@ export function genData(el: ASTElement, state: CodegenState): string {
     }
     // slot target
     // only for non-scoped slots
-    // 处理 <div slot></div>  => el.slotTarget = '"default"' =>  data = '{...  slot: "default"}'
+    // 处理 <template slot="header" ></template>  <p slot="footer"></p>
+    //  结果为 template : { attrs: { slot: "footer" }, slot: "footer" }
     if (el.slotTarget && !el.slotScope) {
         data += `slot:${el.slotTarget},`
     }
-    // scoped slots
-    // 处理  <slot ></slot> 节点
+    // scoped slots  
+    // 如果插槽上还定义了 作用域 scope slot-scope
+    // 处理插槽占位符节点 的 父节点上currentParent.scopedSlots[name]属性
+    //  如 <template slot-scope="scope"></template> 这种
     if (el.scopedSlots) {
         data += `${genScopedSlots(el.scopedSlots, state)},`
     }
@@ -444,6 +447,28 @@ function genInlineTemplate(el: ASTElement, state: CodegenState): ? string {
     }
 }
 
+/**
+ * 处理占位符插槽节点 的父节点
+    <template slot="header" slot-scope="slotProps">
+        <h1>Here might be a page title : {{slotProps.name}}</h1>
+    /template>
+
+    header.scopedSlots.header = el(slot);
+
+    {
+      scopedSlots : _u([
+        {
+            key : 'header',
+            fn : function (slotProps){
+                return [ _c('h1' ,_v('Here might be a page title :' + _s(slotProps.name)) )]
+            }
+        }
+      ])
+    }
+
+ * @param {*} slots 保存着占位符插槽的节点
+ * @param {*} state 
+ */
 function genScopedSlots(
     slots: {
         [key: string]: ASTElement },
@@ -456,21 +481,61 @@ function genScopedSlots(
   }])`
 }
 
+/**
+ * 处理插槽的 slot-scope scope属性 节点
+ 
+ <template slot="header" slot-scope="slotProps">
+    <h1>Here might be a page title : {{slotProps.name}}</h1>
+ </template>
+
+ el:
+    parentEl.scopedSlots.header = {
+        tag : 'template',
+        slotScope : 'slotProps',
+        slotTarget : 'header',
+        children : [ ... ]
+    }
+
+ generate : 
+    {
+        key : 'header',
+        fn : function (slotProps){
+            return [ _c('h1' ,_v('Here might be a page title :' + _s(slotProps.name)) )]
+        }
+    }
+
+ * @param {*} key 
+ * @param {*} el 
+ * @param {*} state 
+ */
 function genScopedSlot(
     key: string,
     el: ASTElement,
     state: CodegenState
 ): string {
+    // 判断作用域插槽上是否存在 v-for 
     if (el.for && !el.forProcessed) {
         return genForScopedSlot(key, el, state)
     }
+    /*
+    一般的作用域插槽
+    返回一个函数入参为作用的名称，返回为插槽的子节点
+    
+    1. <template slot-scope="scope"></template>
+     => genChildren(el, state) || 'undefined'
+    2. <div slot-scope="scope"></div>
+     => genElement(el, state)
+    3. <template slot-scope="scope" v-if="xxx"></template>
+     => `${el.if}?${genChildren(el, state) || 'undefined'}:undefined`
+     */
     const fn = `function(${String(el.slotScope)}){` +
         `return ${el.tag === 'template'
       ? el.if
-        ? `${el.if}?${genChildren(el, state) || 'undefined'}:undefined`
-        : genChildren(el, state) || 'undefined'
-      : genElement(el, state)
+        ? `${el.if}?${genChildren(el, state) || 'undefined'}:undefined`   // <template slot-scope="scope" v-if="xxx"></template>
+        : genChildren(el, state) || 'undefined'    // <template slot-scope="scope"></template>
+      : genElement(el, state)    // <div slot-scope="scope"></div>
     }}`
+    // {key:"header",fn:function(slotProps){return [_c('h1',[_v("Here might be a page title : "+_s(slotProps.name))])]}}
     return `{key:${key},fn:${fn}}`
 }
 
@@ -574,9 +639,21 @@ export function genComment(comment: ASTText): string {
 
 /**
  * 处理 
-  <slot name="header">
+  <slot name="header" v-bind:scopeProps="obj">
     <span>slot header</span>
   </slot>
+
+  el : 
+  {
+      tag : 'slot',
+      slotName : 'header',
+      attrsList : [{
+          name : 'v-bind:scopeProps',
+          value : 'obj'
+      }]
+  }
+  generate : 
+  _t("header", [_c('h1',[_v("this is default header : "+_s(obj.name))])] ,{ scopeProps:obj })
  * @param {*} el 
  * @param {*} state 
  */

@@ -174,7 +174,7 @@ export function parse(
             // v-pre： 跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签。跳过大量没有指令的节点会加快编译。
             if (!inVPre) {
                 processPre(element)
-                // 如果element.pre = true; 代表此节点上存在 v-pre 指令 那么
+                    // 如果element.pre = true; 代表此节点上存在 v-pre 指令 那么
                 if (element.pre) {
                     inVPre = true
                 }
@@ -192,12 +192,12 @@ export function parse(
                 // structural directives
                 // 处理directives 中的 v-for
                 processFor(element)
-                 // 处理directives 中的 v-if
+                    // 处理directives 中的 v-if
                 processIf(element)
-                // 处理 v-once
+                    // 处理 v-once
                 processOnce(element)
-                // element-scope stuff
-                // 处理一些非特性属性   如 事件 指令 其他属性
+                    // element-scope stuff
+                    // 处理一些非特性属性   如 事件 指令 其他属性
                 processElement(element, options)
             }
 
@@ -225,7 +225,7 @@ export function parse(
                 // 因为 root初始化的时候为 false; 所以此处 root = element;将当前节点作为根节点对象
                 // 但是vue 允许 根节点为 <div v-if> xxx </div> <div v-else-if>xx</div> <div v-else>xx</div>这种情况如何处理
                 root = element
-                // 根节点 不能为 <slot></slot> <template></template> 或者包含 v-for属性
+                    // 根节点 不能为 <slot></slot> <template></template> 或者包含 v-for属性
                 checkRootConstraints(root)
             } else if (!stack.length) {
                 // allow root elements with v-if, v-else-if and v-else
@@ -234,7 +234,7 @@ export function parse(
                 // 如果stack.length === 0 且 root存在 那么此时这个节点肯定是 根节点的兄弟判断节点
                 if (root.if && (element.elseif || element.else)) {
                     checkRootConstraints(element)
-                    // 跟下面的currentParent处理一样 将此节点存放在 根v-if节点的ifConditions数组中
+                        // 跟下面的currentParent处理一样 将此节点存放在 根v-if节点的ifConditions数组中
                     addIfCondition(root, {
                         exp: element.elseif,
                         block: element
@@ -257,17 +257,36 @@ export function parse(
                     // 为什么 el.elseif 与 el.else 没有 最后的else 。就是在currentParent下 其浓缩在一个节点el上 (v-if),所以不需要插入
                     processIfConditions(element, currentParent)
                 } else if (element.slotScope) { // scoped slot
+                    // 处理对于插槽的实例节点 其如果在其中定义了slot-scope || scope = 'header' 的这种节点的处理
+                    /*
+                        <template slot="header" slot-scope="slotProps">
+                            <h1>Here might be a page title : {{slotProps.name}}</h1>
+                        </template>
+                     */
                     // 同样对于 <slot></slot>这种节点元素其也只是一个插槽，不需要生成实际的节点
                     currentParent.plain = false
                     // 插槽的默认名称 为default 
+                    /*
+                    <yz-header>
+                        <p>A paragraph for the main content.</p>
+                        <p slot-scope="scope">And another one. {{scope}}</p>
+                    </yz-header>
+
+                    如果没有 slot-scope="scope" 那么子组件 slot插槽的内容为
+                    A paragraph for the main content.
+                    And another one. 
+                    
+                    但是存在 slot-scope="scope" 使得其跟 <p slot='default' slot-scope="scope">And another one. {{scope}}</p>
+                    一样 给几点添加了一个slotTarget = default 
+                    使得默认的<p>A paragraph for the main content.</p> 被覆盖
+                    */
                     const name = element.slotTarget || '"default"';
-                    // 插槽的节点 存放在 parent.scopedSlots 属性上
-                    // TODO: 插槽 slot
+                    // 插槽的节点 存放在 parent.scopedSlots 属性上，而不是像其他的节点 放在 children属性 上
                     (currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
                 } else {
                     // 如上面 currentParent = div 那么此时就构成了 div>span 的树
                     currentParent.children.push(element)
-                    // span 的父节点  也就指向 div
+                        // span 的父节点  也就指向 div
                     element.parent = currentParent
                 }
             }
@@ -275,7 +294,7 @@ export function parse(
             if (!unary) {
                 // currentParent = element 那么下面处理的节点都是其子节点
                 currentParent = element
-                // 队列中 push 这个节点 等待后面找到 其闭合节点
+                    // 队列中 push 这个节点 等待后面找到 其闭合节点
                 stack.push(element)
             } else {
                 closeElement(element)
@@ -308,8 +327,8 @@ export function parse(
             // pop stack
             // stack 栈移除最后一个  stack = [ el('div') ]
             stack.length -= 1
-            // 在之前currentParent = 最后一个 没有闭合标签 ，此处如 el('span')
-            // 那么这时候span 已经找到了并且闭合了，那么下面处理的应该是stack 最后一个（el('div')）也就变成了当前处理的标签
+                // 在之前currentParent = 最后一个 没有闭合标签 ，此处如 el('span')
+                // 那么这时候span 已经找到了并且闭合了，那么下面处理的应该是stack 最后一个（el('div')）也就变成了当前处理的标签
             currentParent = stack[stack.length - 1]
             closeElement(element)
         },
@@ -349,7 +368,7 @@ export function parse(
                 return
             }
             const children = currentParent.children
-            // 处理 <pre></pre> 期间的文本内容
+                // 处理 <pre></pre> 期间的文本内容
             text = inPre || text.trim() ?
                 isTextTag(currentParent) ? text : decodeHTMLCached(text)
                 // only preserve whitespace if its not right after a starting tag
@@ -359,8 +378,8 @@ export function parse(
             // 如果 存在文本
             if (text) {
                 let res
-                // 处理非 v-pre 指令下的文本节点
-                // 并通过parseText 解析文本 {{}} 使其转换成可执行的响应式文本
+                    // 处理非 v-pre 指令下的文本节点
+                    // 并通过parseText 解析文本 {{}} 使其转换成可执行的响应式文本
                 if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
                     // 将需要进行响应式的文本节点存入children
                     children.push({
@@ -487,8 +506,8 @@ function processRef(el) {
     if (ref) {
         // 保存属性到AST.ref上
         el.ref = ref
-        // 判断 ref 是否在 v-for节点或者 父节点中存在 v-for 属性
-        // 即 判断是否在v-for 节点中
+            // 判断 ref 是否在 v-for节点或者 父节点中存在 v-for 属性
+            // 即 判断是否在v-for 节点中
         el.refInFor = checkInFor(el)
     }
 }
@@ -538,9 +557,9 @@ export function parseFor(exp: string): ? ForParseResult {
     const inMatch = exp.match(forAliasRE)
     if (!inMatch) return
     const res = {}
-    // res.for 指向 响应式数据
+        // res.for 指向 响应式数据
     res.for = inMatch[2].trim()
-    //  去除参数两边的空格和()   '(item,index)' -> item,index
+        //  去除参数两边的空格和()   '(item,index)' -> item,index
     const alias = inMatch[1].trim().replace(stripParensRE, '')
 
     // 处理参数   获取参数的值，Vue中对于for 最多支持3个参数  (item,index,key)
@@ -550,9 +569,9 @@ export function parseFor(exp: string): ? ForParseResult {
         //  上面 alias.match(forIteratorRE) 是匹配回去 , 后面的参数；那么此时直接 替换,后面的参数
         //  res.alias 就是获取第一个参数   === item
         res.alias = alias.replace(forIteratorRE, '')
-        // 获取第二个参数  res.iterator1 = index
+            // 获取第二个参数  res.iterator1 = index
         res.iterator1 = iteratorMatch[1].trim()
-        // 如果存在第三个参数， 获取第三个参数  res.iterator1 = key
+            // 如果存在第三个参数， 获取第三个参数  res.iterator1 = key
         if (iteratorMatch[2]) {
             res.iterator2 = iteratorMatch[2].trim()
         }
@@ -632,7 +651,7 @@ function processIfConditions(el, parent) {
     // 找到当前节点的上一个兄弟节点，其肯定为此时他们父节点的最后一个元素子节点
     // 当我们
     const prev = findPrevElement(parent.children)
-    // 判断元素子节点中是否存在 v-if
+        // 判断元素子节点中是否存在 v-if
     if (prev && prev.if) {
         // 如果存在 就在上一个兄弟节点的 el.ifConditions = []添加此条件
         addIfCondition(prev, {
@@ -657,15 +676,15 @@ function processIfConditions(el, parent) {
  */
 function findPrevElement(children: Array < any > ) : ASTElement | void {
     let i = children.length
-    // 从后往前寻找
+        // 从后往前寻找
     while (i--) {
         // 如果其为元素节点 那么就返回
         if (children[i].type === 1) {
             return children[i]
 
-        // 处理这种情况   <div>  <div v-if>xx</div>text <div v-else></div> </div>
-        // 中间穿插了text节点 那么就提示 不能包含文本节点
-        // 
+            // 处理这种情况   <div>  <div v-if>xx</div>text <div v-else></div> </div>
+            // 中间穿插了text节点 那么就提示 不能包含文本节点
+            // 
         } else {
             if (process.env.NODE_ENV !== 'production' && children[i].text !== ' ') {
                 warn(
@@ -697,7 +716,7 @@ export function addIfCondition(el: ASTElement, condition: ASTIfCondition) {
 function processOnce(el) {
     // 获取v-once属性的值
     const once = getAndRemoveAttr(el, 'v-once')
-    // 如果存在就保存在 el.once 属性上
+        // 如果存在就保存在 el.once 属性上
     if (once != null) {
         el.once = true
     }
@@ -729,7 +748,7 @@ function processSlot(el) {
         if (el.tag === 'template') {
             // <template slot="scope"></template>
             slotScope = getAndRemoveAttr(el, 'scope')
-            /* istanbul ignore if */
+                /* istanbul ignore if */
             if (process.env.NODE_ENV !== 'production' && slotScope) {
                 warn(
                     `the "scope" attribute for scoped slots have been deprecated and ` +
@@ -758,8 +777,8 @@ function processSlot(el) {
         const slotTarget = getBindingAttr(el, 'slot')
         if (slotTarget) {
             el.slotTarget = slotTarget === '""' ? '"default"' : slotTarget
-            // preserve slot as an attribute for native shadow DOM compat
-            // only for non-scoped slots.
+                // preserve slot as an attribute for native shadow DOM compat
+                // only for non-scoped slots.
             if (el.tag !== 'template' && !el.slotScope) {
                 addAttr(el, 'slot', slotTarget)
             }
@@ -781,7 +800,7 @@ function processSlot(el) {
  */
 function processComponent(el) {
     let binding
-    // 获取节点的响应式属性 is 
+        // 获取节点的响应式属性 is 
     if ((binding = getBindingAttr(el, 'is'))) {
         el.component = binding
     }
@@ -809,14 +828,14 @@ function processAttrs(el) {
     for (i = 0, l = list.length; i < l; i++) {
         name = rawName = list[i].name
         value = list[i].value
-        // 处理遗留的 响应式属性， 如 :id="idName", 自已的的指令 v-directive ,v-bind , @
+            // 处理遗留的 响应式属性， 如 :id="idName", 自已的的指令 v-directive ,v-bind , @
         if (dirRE.test(name)) {
             // mark element as dynamic
             el.hasBindings = true
-            // modifiers  处理 <div v-zdy.name="xxx">xxx</div> v-zdy后面的属性描述符
-            // 将其转换成对象的形式  { name : true }
+                // modifiers  处理 <div v-zdy.name="xxx">xxx</div> v-zdy后面的属性描述符
+                // 将其转换成对象的形式  { name : true }
             modifiers = parseModifiers(name)
-            // 如果存在属性描述符  那么其name 就需要去除属性描述符
+                // 如果存在属性描述符  那么其name 就需要去除属性描述符
             if (modifiers) {
                 //  v-zdy.name  => v-zdy
                 name = name.replace(modifierRE, '')
@@ -825,7 +844,7 @@ function processAttrs(el) {
             if (bindRE.test(name)) { // v-bind
                 // 获取属性的名称  移除 : | v-bind:
                 name = name.replace(bindRE, '')
-                //  处理value 解析成正确的value
+                    //  处理value 解析成正确的value
                 value = parseFilters(value)
                 isProp = false
                 if (modifiers) {
@@ -833,9 +852,9 @@ function processAttrs(el) {
                     // <div v-bind:text-content.prop="text"></div>
                     if (modifiers.prop) {
                         isProp = true
-                        // text-content -> textContent
+                            // text-content -> textContent
                         name = camelize(name)
-                        // 如果是 <div v-bind:inner-html.prop="text"></div>  转成 innerHTML
+                            // 如果是 <div v-bind:inner-html.prop="text"></div>  转成 innerHTML
                         if (name === 'innerHtml') name = 'innerHTML'
                     }
                     // <svg :view-box.camel="viewBox"></svg>
@@ -857,25 +876,25 @@ function processAttrs(el) {
                     // 添加 到 el.props 属性数组中 [{ innerHTML : value }]
                     addProp(el, name, value)
                 } else {
-                     // 添加 到 el.attrs 属性数组中 [{ title : value }]
+                    // 添加 到 el.attrs 属性数组中 [{ title : value }]
                     addAttr(el, name, value)
                 }
             } else if (onRE.test(name)) { // v-on
                 // 处理 v-on 或者 @ 属性  如 <div v-on:click="xxx" @change="xxx">
                 // v-on:click => click
                 name = name.replace(onRE, '')
-                // 添加事件属性
+                    // 添加事件属性
                 addHandler(el, name, value, modifiers, false, warn)
             } else { // normal directives
                 // 处理自定义指令  <div id="hook-arguments-example" v-demo:foo.a.b="message"></div>
 
                 // v-demo:foo.a.b -> demo:foo  名称和参数
                 name = name.replace(dirRE, '')
-                // parse arg
-                // 获取自定义指令的参数 
-                // [ 0 : ':foo' ,1 : 'foo' , input : 'demo:foo']
+                    // parse arg
+                    // 获取自定义指令的参数 
+                    // [ 0 : ':foo' ,1 : 'foo' , input : 'demo:foo']
                 const argMatch = name.match(argRE)
-                // 如果存在参数
+                    // 如果存在参数
                 const arg = argMatch && argMatch[1]
                 if (arg) {
                     // 如果指令的名称  demo:foo -> demo
@@ -906,8 +925,8 @@ function processAttrs(el) {
             }
             // 如 <div id="xx"> id这种没有特殊处理的静态属性， 那么此时直接添加到el 上
             addAttr(el, name, JSON.stringify(value))
-            // #6887 firefox doesn't update muted state if set via attribute
-            // even immediately after element creation
+                // #6887 firefox doesn't update muted state if set via attribute
+                // even immediately after element creation
             if (!el.component &&
                 name === 'muted' &&
                 platformMustUseProp(el.tag, el.attrsMap.type, name)) {

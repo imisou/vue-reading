@@ -28,7 +28,7 @@ export function optimize(root: ? ASTElement, options : CompilerOptions) {
     isPlatformReservedTag = options.isReservedTag || no
     // first pass: mark all non-static nodes.
     // 标记节点是否是静态节点
-    7markStatic(root)
+    markStatic(root)
     // second pass: mark static roots.
     // 标记节点是否是静态根节点
     markStaticRoots(root, false)

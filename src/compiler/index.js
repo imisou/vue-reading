@@ -78,6 +78,8 @@ export const createCompiler = createCompilerCreator(function baseCompile(
 
     // 将HTML 转换成 AST 对象
     const ast = parse(template.trim(), options)
+
+    // 标记静态节点、静态根节点
     if (options.optimize !== false) {
         optimize(ast, options)
     }

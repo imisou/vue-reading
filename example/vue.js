@@ -2566,6 +2566,7 @@
         children,
         context
     ) {
+        debugger;
         var slots = {};
         if (!children) {
             return slots
@@ -2654,6 +2655,7 @@
 
     function lifecycleMixin(Vue) {
         Vue.prototype._update = function(vnode, hydrating) {
+            debugger;
             var vm = this;
            
             var prevEl = vm.$el;
@@ -3759,6 +3761,7 @@
         props,
         bindObject
     ) {
+
         var scopedSlotFn = this.$scopedSlots[name];
         var nodes;
         if (scopedSlotFn) { // scoped slot
@@ -5572,7 +5575,7 @@
             ownerArray,
             index
         ) {
-          
+            debugger;
             if (isDef(vnode.elm) && isDef(ownerArray)) {
                 // This vnode was used in a previous render!
                 // now it's used as a new node, overwriting its elm would cause
@@ -5632,6 +5635,7 @@
         }
 
         function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
+            debugger;
             var i = vnode.data;
             if (isDef(i)) {
                 var isReactivated = isDef(vnode.componentInstance) && i.keepAlive;
@@ -10903,13 +10907,13 @@
     ) {
 
         var ast = parse(template.trim(), options);
-        debugger;
+ 
         if (options.optimize !== false) {
             optimize(ast, options);
         }
-        debugger;
+
         var code = generate(ast, options);
-        debugger;
+
         return {
             ast: ast,
             render: code.render,

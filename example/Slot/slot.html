@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Watcher</title>
+</head>
+
+<body>
+    <div id="app">
+        <yz-header>
+            <div slot="header">
+                <p>this is header1</p>
+            </div>
+            <div slot="header">
+                <p>this is header2</p>
+            </div>
+            <div slot="footer">
+                <p>this is footer1</p>
+            </div>
+            <div slot="footer" slot-scope="scope">
+                <p>this is footer2</p>
+            </div>
+            <div slot="footer" slot-scope="scope">
+                <p>this is footer3</p>
+            </div>
+
+            <p>xxxxxxxxxx : {{childNamekey}}</p>
+            <p>lllllllll</p>
+            <p>aaaaaaaaaaaaa</p>
+        </yz-header>
+        <button @click="changeNameKey">changeNameKey</button>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/template" id="yz-header">
+    <div class="container">
+        <header>
+            <slot name="header" v-bind:scopeProps="obj">
+                <h1>this is default header : {{obj.name}}</h1>
+            </slot>
+        </header>
+        <main>
+            <slot v-bind:dScope="obj"></slot>
+        </main>
+        <slot name="extend">
+            <p>this is extend default content</p>
+        </slot>
+        <footer>
+            <slot name="footer" v-bind:fScope="obj"></slot>
+        </footer>
+    </div>
+</script>
+<script type="text/javascript">
+var yzHeader = Vue.component('yz-header', {
+    props: {
+        name: [String],
+        nameKey: {
+            type: [Boolean, String]
+        }
+    },
+    data: function() {
+        return {
+            count: 0,
+            obj: {
+                name: 'xasxasx'
+            }
+        }
+    },
+    template: "#yz-header"
+})
+var vue = new Vue({
+    el: "#app",
+    components: {
+        yzHeader
+    },
+    data: function() {
+        return {
+            name: "",
+            childNamekey: 'namekey'
+        }
+    },
+    methods: {
+        changeNameKey() {
+            this.childNamekey = Math.random() + ' name key';
+        }
+    }
+})
+</script>
+
+</html>
