@@ -1007,6 +1007,8 @@
                             dependArray(value);
                         }
                     }
+                    console.log(value);
+                    console.log(dep);
                 }
                 return value
             },
@@ -3761,7 +3763,7 @@
         props,
         bindObject
     ) {
-
+        debugger;
         var scopedSlotFn = this.$scopedSlots[name];
         var nodes;
         if (scopedSlotFn) { // scoped slot
@@ -4572,6 +4574,7 @@
             vm.$vnode = _parentVnode;
             // render self
             var vnode;
+            debugger;
             try {
                 vnode = render.call(vm._renderProxy, vm.$createElement);
             } catch (e) {
@@ -6118,7 +6121,8 @@
             }
         }
 
-        return function patch(oldVnode, vnode, hydrating, removeOnly) {        
+        return function patch(oldVnode, vnode, hydrating, removeOnly) {   
+            debugger;     
             if (isUndef(vnode)) {
                 if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
                 return
