@@ -874,6 +874,7 @@ function processAttrs(el) {
                 }
                 if (isProp || (!el.component && platformMustUseProp(el.tag, el.attrsMap.type, name))) {
                     // 添加 到 el.props 属性数组中 [{ innerHTML : value }]
+                    // 或者如 input 元素上的value checked option上的selected 详情请看platforms/utils/attrs.js mustUseProp
                     addProp(el, name, value)
                 } else {
                     // 添加 到 el.attrs 属性数组中 [{ title : value }]

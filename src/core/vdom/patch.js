@@ -802,12 +802,15 @@ function patchVnode(oldVnode, vnode, insertedVnodeQueue, removeOnly) {
 	// reuse element for static trees.
 	// note we only do this if the vnode is cloned -
 	// if the new node is not cloned it means the render functions have been
-	// reset by the hot-reload-api and we need to do a proper re-render.
+    // reset by the hot-reload-api and we need to do a proper re-render.
+    // 为静态树重用元素。注意，我们只在克隆vnode时才这样做——如果没有克隆新的节点，这意味着呈现函数已经被热重加载api重置，我们需要做一个适当的重新呈现。
+    // 对于v-for下的v-once节点 其不想其他的静态根节点缓存在 this._staticTrees数组下。
 	if (isTrue(vnode.isStatic) &&
 		isTrue(oldVnode.isStatic) &&
 		vnode.key === oldVnode.key &&
 		(isTrue(vnode.isCloned) || isTrue(vnode.isOnce))
 	) {
+        // TODO: 为什么需要将旧的componentInstance 赋给新的 vnode
 		vnode.componentInstance = oldVnode.componentInstance
 		return
 	}

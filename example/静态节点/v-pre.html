@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>{{name}}</div>
+        <div v-pre :class="{'ui':name === 1}">
+            {{name}}
+            <scope-first :count="name">xxxx</scope-first>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var scopeFirst = Vue.component('scope-first', {
+    functional: true,
+    render: function(createElement, context) {
+        console.log(context)
+        console.log(context)
+        return createElement('div', {
+            class: 'child-div'
+        }, [
+            createElement('div', {}, 'this is child'),
+            createElement('div', {}, 'xxx' + context.props.count)
+        ])
+    }
+})
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    components: {
+        scopeFirst
+    },
+    data: function() {
+        return {
+            name: 1,
+            arr: [{
+                id: 1,
+                value: 1
+            }]
+        }
+    },
+    methods: {
+        appMethods: function() {
+
+        }
+    }
+})
+</script>
+
+</html>

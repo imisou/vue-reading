@@ -2568,7 +2568,6 @@
         children,
         context
     ) {
-        debugger;
         var slots = {};
         if (!children) {
             return slots
@@ -2657,7 +2656,6 @@
 
     function lifecycleMixin(Vue) {
         Vue.prototype._update = function(vnode, hydrating) {
-            debugger;
             var vm = this;
            
             var prevEl = vm.$el;
@@ -3855,6 +3853,7 @@
         asProp,
         isSync
     ) {
+
         if (value) {
             if (!isObject(value)) {
                 "development" !== 'production' && warn(
@@ -3932,6 +3931,7 @@
         index,
         key
     ) {
+        debugger;
         markStatic(tree, ("__once__" + index + (key ? ("_" + key) : "")), true);
         return tree
     }
@@ -4067,7 +4067,7 @@
         contextVm,
         children
     ) {
-
+        debugger;
         var options = Ctor.options;
         var props = {};
         var propOptions = options.props;
@@ -4574,7 +4574,7 @@
             vm.$vnode = _parentVnode;
             // render self
             var vnode;
-            debugger;
+ 
             try {
                 vnode = render.call(vm._renderProxy, vm.$createElement);
             } catch (e) {
@@ -5578,7 +5578,7 @@
             ownerArray,
             index
         ) {
-            debugger;
+            
             if (isDef(vnode.elm) && isDef(ownerArray)) {
                 // This vnode was used in a previous render!
                 // now it's used as a new node, overwriting its elm would cause
@@ -5638,7 +5638,6 @@
         }
 
         function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
-            debugger;
             var i = vnode.data;
             if (isDef(i)) {
                 var isReactivated = isDef(vnode.componentInstance) && i.keepAlive;
@@ -6121,8 +6120,7 @@
             }
         }
 
-        return function patch(oldVnode, vnode, hydrating, removeOnly) {   
-            debugger;     
+        return function patch(oldVnode, vnode, hydrating, removeOnly) {      
             if (isUndef(vnode)) {
                 if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
                 return
@@ -10526,6 +10524,7 @@
         altGenElement,
         altGenNode
     ) {
+        debugger;
         var children = el.children;
         if (children.length) {
             var el$1 = children[0];
@@ -10917,7 +10916,7 @@
         }
 
         var code = generate(ast, options);
-
+        debugger;
         return {
             ast: ast,
             render: code.render,

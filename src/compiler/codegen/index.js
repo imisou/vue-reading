@@ -141,7 +141,9 @@ function genOnce(el: ASTElement, state: CodegenState): string {
     el.onceProcessed = true
     if (el.if && !el.ifProcessed) {
         return genIf(el, state)
+        
     } else if (el.staticInFor) {
+        // 处理 v-for 节点下的 v-once 节点
         let key = ''
         let parent = el.parent
         while (parent) {

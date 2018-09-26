@@ -138,6 +138,7 @@ export function FunctionalRenderContext(
     }
 }
 
+// 让函数式组件也支持 _u _t _l... 组件render时候 需要的实例方法
 installRenderHelpers(FunctionalRenderContext.prototype)
 
 
@@ -166,7 +167,9 @@ export function createFunctionalComponent(
             props[key] = validateProp(key, propOptions, propsData || emptyObject)
         }
     } else {
+        // 获取组件占位符节点上定义的 attrs 属性
         if (isDef(data.attrs)) mergeProps(props, data.attrs)
+    
         if (isDef(data.props)) mergeProps(props, data.props)
     }
 

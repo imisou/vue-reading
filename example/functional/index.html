@@ -9,40 +9,15 @@
 <body>
     <div id="app">
         <div>this is app</div>
-        <scope-first>
-            <template slot="header">
-                <div class="app-header">
-                    this is header
-                </div>
-            </template>
-            <div class="app-body">
-                this is body
-
-            </div>
-        </scope-first>
+        <p :class="{'ui-name' : name === 1}"></p>
+        <scope-first id="scopeFirst" dname="name" :name="name" value="name" v-on:click="asdasd" ></scope-first>
     </div>
 </body>
-<script type="text/x-template" id="function-child">
-    <div>
-        <div>this is child</div>
-        <slot name="header"></slot>
-        <slot></slot>
-    </div>
-</script>
-<script type="text/x-template" id="function-grandson">
-    <div>
-        <div>this is child</div>
-        <slot name="header"></slot>
-        <slot></slot>
-    </div>
-</script>
+
 <script type="text/javascript" src="../vue.js"></script>
 <script type="text/javascript">
 var scopeFirst = Vue.component('scope-first', {
     functional: true,
-    props:{
-
-    },
     data: function() {
         return {
             count: 0
@@ -70,7 +45,7 @@ var vue = new Vue({
     },
     data: function() {
         return {
-
+            name:1
         }
     },
     methods: {

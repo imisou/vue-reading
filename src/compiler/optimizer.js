@@ -99,7 +99,7 @@ function markStatic(node: ASTNode) {
  *   2、v-if.v-else-if v-else 三种节点是 存放在v-if节点的 node.ifConditions属性下，而不是我们正常的node.children属性。
  *      所以我们也需要根据 条件1 去判断其 其他节点是否是静态根节点
  * @param {*} node 
- * @param {*} isInFor 
+ * @param {*} isInFor    节点或者父节点存在 v-for 属性那么 isInFor = true;
  */
 function markStaticRoots(node: ASTNode, isInFor: boolean) {
     // 只有元素节点 才可能是静态根节点
@@ -129,6 +129,7 @@ function markStaticRoots(node: ASTNode, isInFor: boolean) {
         }
         if (node.children) {
             for (let i = 0, l = node.children.length; i < l; i++) {
+                // 节点或者父节点存在 v-for 属性那么 isInFor = true;
                 markStaticRoots(node.children[i], isInFor || !!node.for)
             }
         }
