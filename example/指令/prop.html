@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <input :value="name" name="" id="ipt1">
+       <!--  <input :value.prop="name" name="" id="ipt2"> -->
+        <div :text-content="value"></div>
+        <div :text-content.prop="value"></div>
+        <div :value="value"></div>
+        <div :value.prop="value"></div>
+       
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+   
+    data: function() {
+        return {
+            name: 1,
+            value:2,
+            arr: [{
+                id: 1,
+                value: 1
+            }]
+        }
+    },
+    methods: {
+        appMethods: function() {
+
+        }
+    }
+})
+
+setTimeout(function(){
+    vue.name  = '123'
+},3000)
+</script>
+
+</html>

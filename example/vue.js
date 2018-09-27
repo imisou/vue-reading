@@ -1007,8 +1007,7 @@
                             dependArray(value);
                         }
                     }
-                    console.log(value);
-                    console.log(dep);
+                    
                 }
                 return value
             },
@@ -2085,6 +2084,7 @@
     /*  */
 
     function mergeVNodeHook(def, hookKey, hook) {
+
         if (def instanceof VNode) {
             def = def.data.hook || (def.data.hook = {});
         }
@@ -3538,7 +3538,6 @@
             var watcher = this._computedWatchers && this._computedWatchers[key];
             if (watcher) {
                 watcher.depend();
-                console.log(watcher.dep.subs);
                 return watcher.evaluate()
             }
         }
@@ -3761,7 +3760,7 @@
         props,
         bindObject
     ) {
-        debugger;
+
         var scopedSlotFn = this.$scopedSlots[name];
         var nodes;
         if (scopedSlotFn) { // scoped slot
@@ -3931,7 +3930,6 @@
         index,
         key
     ) {
-        debugger;
         markStatic(tree, ("__once__" + index + (key ? ("_" + key) : "")), true);
         return tree
     }
@@ -4067,7 +4065,7 @@
         contextVm,
         children
     ) {
-        debugger;
+     
         var options = Ctor.options;
         var props = {};
         var propOptions = options.props;
@@ -4618,7 +4616,7 @@
 
     function initMixin(Vue) {
         Vue.prototype._init = function(options) {
-          
+
             var vm = this;
             // a uid
             vm._uid = uid$3++;
@@ -5592,8 +5590,7 @@
             if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
                 return
             }
-
-            var data = vnode.data;
+             var data = vnode.data;
             var children = vnode.children;
             var tag = vnode.tag;
             if (isDef(tag)) {
@@ -6242,6 +6239,7 @@
     }
 
     function _update(oldVnode, vnode) {
+
         var isCreate = oldVnode === emptyNode;
         var isDestroy = vnode === emptyNode;
         var oldDirs = normalizeDirectives$1(oldVnode.data.directives, oldVnode.context);
@@ -6491,6 +6489,7 @@
     var validDivisionCharRE = /[\w).+\-_$\]]/;
 
     function parseFilters(exp) {
+        debugger;
         var inSingle = false;
         var inDouble = false;
         var inTemplateString = false;
@@ -6503,6 +6502,7 @@
 
         for (i = 0; i < exp.length; i++) {
             prev = c;
+            var char = String.fromCharCode(c);
             c = exp.charCodeAt(i);
             if (inSingle) {
                 if (c === 0x27 && prev !== 0x5C) { inSingle = false; }
@@ -7175,6 +7175,7 @@
     /*  */
 
     function updateDOMProps(oldVnode, vnode) {
+
         if (isUndef(oldVnode.data.domProps) && isUndef(vnode.data.domProps)) {
             return
         }
@@ -9867,6 +9868,7 @@
     /*  */
 
     function text(el, dir) {
+
         if (dir.value) {
             addProp(el, 'textContent', ("_s(" + (dir.value) + ")"));
         }
@@ -10216,8 +10218,10 @@
         ast,
         options
     ) {
+      
         var state = new CodegenState(options);
         var code = ast ? genElement(ast, state) : '_c("div")';
+       
         return {
             render: ("with(this){return " + code + "}"),
             staticRenderFns: state.staticRenderFns
@@ -10447,6 +10451,7 @@
             dir = dirs[i];
             needRuntime = true;
             var gen = state.directives[dir.name];
+        
             if (gen) {
                 // compile-time directive that manipulates AST.
                 // returns true if it also needs a runtime counterpart.
@@ -10524,7 +10529,7 @@
         altGenElement,
         altGenNode
     ) {
-        debugger;
+
         var children = el.children;
         if (children.length) {
             var el$1 = children[0];
@@ -10916,7 +10921,7 @@
         }
 
         var code = generate(ast, options);
-        debugger;
+     
         return {
             ast: ast,
             render: code.render,

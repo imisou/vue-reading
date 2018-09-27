@@ -140,9 +140,8 @@ export function parse(
             // check namespace.
             // inherit parent ns if there is one
             const ns = (currentParent && currentParent.ns) || platformGetTagNamespace(tag)
-
-            // handle IE svg bug
-            /* istanbul ignore if */
+                // handle IE svg bug
+                /* istanbul ignore if */
             if (isIE && ns === 'svg') {
                 attrs = guardIESVGBug(attrs)
             }
@@ -153,7 +152,6 @@ export function parse(
             if (ns) {
                 element.ns = ns
             }
-
             // 如果元素 是 style | script 且 type="text/javascript"
             if (isForbiddenTag(element) && !isServerRendering()) {
                 element.forbidden = true
@@ -163,13 +161,11 @@ export function parse(
                     `<${tag}>` + ', as they will not be parsed.'
                 )
             }
-
             // apply pre-transforms
             for (let i = 0; i < preTransforms.length; i++) {
                 // 调用定义modules 中 所有的 preTransforms 钩子函数。 如 platforms/web/compiler/moudles/model.js preTransforms方法
                 element = preTransforms[i](element, options) || element
             }
-
             // 处理 v-pre 指令
             // v-pre： 跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签。跳过大量没有指令的节点会加快编译。
             if (!inVPre) {
@@ -200,7 +196,6 @@ export function parse(
                     // 处理一些非特性属性   如 事件 指令 其他属性
                 processElement(element, options)
             }
-
             // 根节点 不能为 <slot></slot> <template></template> 或者包含 v-for属性
             function checkRootConstraints(el) {
                 if (process.env.NODE_ENV !== 'production') {
@@ -218,7 +213,6 @@ export function parse(
                     }
                 }
             }
-
             // tree management
             // 当处理第一个节点的时候  
             if (!root) {
@@ -247,7 +241,6 @@ export function parse(
                     )
                 }
             }
-
             // 对于根节点 currentParent = undefined
             // 对于子节点    currentParent = 父节点。
             // 首先每一次遇到 没有闭合的标签 如 <div id="app"> <span class="span1"> 当处理span的时候其不是自闭和标签 那么currentParent = div
@@ -265,21 +258,20 @@ export function parse(
                      */
                     // 同样对于 <slot></slot>这种节点元素其也只是一个插槽，不需要生成实际的节点
                     currentParent.plain = false
-                    // 插槽的默认名称 为default 
-                    /*
-                    <yz-header>
-                        <p>A paragraph for the main content.</p>
-                        <p slot-scope="scope">And another one. {{scope}}</p>
-                    </yz-header>
-
-                    如果没有 slot-scope="scope" 那么子组件 slot插槽的内容为
-                    A paragraph for the main content.
-                    And another one. 
-                    
-                    但是存在 slot-scope="scope" 使得其跟 <p slot='default' slot-scope="scope">And another one. {{scope}}</p>
-                    一样 给几点添加了一个slotTarget = default 
-                    使得默认的<p>A paragraph for the main content.</p> 被覆盖
-                    */
+                        // 插槽的默认名称 为default 
+                        /*
+                        <yz-header>
+                            <p>A paragraph for the main content.</p>
+                            <p slot-scope="scope">And another one. {{scope}}</p>
+                        </yz-header>
+                        如果没有 slot-scope="scope" 那么子组件 slot插槽的内容为
+                        A paragraph for the main content.
+                        And another one. 
+            
+                        但是存在 slot-scope="scope" 使得其跟 <p slot='default' slot-scope="scope">And another one. {{scope}}</p>
+                        一样 给几点添加了一个slotTarget = default 
+                        使得默认的<p>A paragraph for the main content.</p> 被覆盖
+                        */
                     const name = element.slotTarget || '"default"';
                     // 插槽的节点 存放在 parent.scopedSlots 属性上，而不是像其他的节点 放在 children属性 上
                     (currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
@@ -300,7 +292,6 @@ export function parse(
                 closeElement(element)
             }
         },
-
         /*
             <div id="app">
                 <span class="span1">span1</span>
@@ -309,7 +300,6 @@ export function parse(
                     <span>    
                 </div>
             </div>
-
             如上面的遇到第一个 闭合标签</span> 那么他就调用options.end()
             此时 stack = [ el('div') , el('span')]
          */
@@ -317,13 +307,11 @@ export function parse(
             // remove trailing whitespace
             // 获取 没有闭合标签栈 中的最后一个  如上面的 el('span')
             const element = stack[stack.length - 1]
-
-            // TODO: 待确认
+                // TODO: 待确认
             const lastNode = element.children[element.children.length - 1]
             if (lastNode && lastNode.type === 3 && lastNode.text === ' ' && !inPre) {
                 element.children.pop()
             }
-
             // pop stack
             // stack 栈移除最后一个  stack = [ el('div') ]
             stack.length -= 1
@@ -332,7 +320,6 @@ export function parse(
             currentParent = stack[stack.length - 1]
             closeElement(element)
         },
-
         /*
             处理解析过程中遇到的文本内容
          */
@@ -374,8 +361,7 @@ export function parse(
                 // only preserve whitespace if its not right after a starting tag
                 :
                 preserveWhitespace && children.length ? ' ' : ''
-
-            // 如果 存在文本
+                // 如果 存在文本
             if (text) {
                 let res
                     // 处理非 v-pre 指令下的文本节点
@@ -829,9 +815,17 @@ function processAttrs(el) {
         name = rawName = list[i].name
         value = list[i].value
             // 处理遗留的 响应式属性， 如 :id="idName", 自已的的指令 v-directive ,v-bind , @
+            /*
+                处理剩余的响应式属性
+                v- 开头的 ：  v-text 、 v-bind: 、 v-on:click 、  v-directive 自定义的
+                : 开头的      :id="xxx"
+                @ 开头的       @click
+             */
         if (dirRE.test(name)) {
             // mark element as dynamic
+            // 标记AST节点有响应式属性
             el.hasBindings = true
+                // 第二步 ： 获取属性的 属性描述符
                 // modifiers  处理 <div v-zdy.name="xxx">xxx</div> v-zdy后面的属性描述符
                 // 将其转换成对象的形式  { name : true }
             modifiers = parseModifiers(name)

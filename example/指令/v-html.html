@@ -8,33 +8,29 @@
 
 <body>
     <div id="app">
-        <div>this is app</div>
-        <div v-for="item in arr" :key="item.id">
-            <div v-once>
-                <p>xxxxx:</p>
-            </div>   
-        </div>
+        <div v-html="html">{{name}}</div>
+        <div :inner-html.prop="html">{{name}}</div>
+        
     </div>
 </body>
-
 <script type="text/javascript" src="../vue.js"></script>
 <script type="text/javascript">
 
 var vue = new Vue({
     name: "App",
     el: "#app",
-    
+   
     data: function() {
         return {
-            name:1,
-            arr:[{
-                id:1,
-                value:1
+            html: `<div style="color:red">div html</div>`,
+            arr: [{
+                id: 1,
+                value: 1
             }]
         }
     },
     methods: {
-        appMethods:function(){
+        appMethods: function() {
 
         }
     }

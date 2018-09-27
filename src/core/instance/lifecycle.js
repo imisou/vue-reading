@@ -40,11 +40,11 @@ export function initLifecycle(vm: Component) {
     }
     // 定义实例属性$parent
     vm.$parent = parent
-    // 定义实例属性 $root 根组件
+        // 定义实例属性 $root 根组件
     vm.$root = parent ? parent.$root : vm
-    // 初始化 其子组件
+        // 初始化 其子组件
     vm.$children = []
-    // 初始化组件的索引对象
+        // 初始化组件的索引对象
     vm.$refs = {}
 
     // 组件状态初始化
@@ -67,22 +67,22 @@ export function lifecycleMixin(Vue: Class < Component > ) {
      */
     Vue.prototype._update = function(vnode: VNode, hydrating ? : boolean) {
         const vm: Component = this
-        // 保存组件 原来的dom
+            // 保存组件 原来的dom
         const prevEl = vm.$el
-        // 保存原来的 组件vnode
-        // 对于更新的情况  因为组件已经生成过 所以触发了 vm._vnode = vnode 所以此时prevVnode 不会空
+            // 保存原来的 组件vnode
+            // 对于更新的情况  因为组件已经生成过 所以触发了 vm._vnode = vnode 所以此时prevVnode 不会空
         const prevVnode = vm._vnode
-        // activeInstance是相当于全局属性，用来保存当前正在处理的组件vm，而此时进行 _update() 所以需要保存原来正在处理的vm，
-        // 保存原来处理的组件
+            // activeInstance是相当于全局属性，用来保存当前正在处理的组件vm，而此时进行 _update() 所以需要保存原来正在处理的vm，
+            // 保存原来处理的组件
         const prevActiveInstance = activeInstance
-        // 赋值activeInstance 保存当前正在处理的组件vm
+            // 赋值activeInstance 保存当前正在处理的组件vm
         activeInstance = vm
-        // 是的组件上的_vnode 等于 组件vnode
-        // 保存当前js -> vnode后新的vnode
+            // 是的组件上的_vnode 等于 组件vnode
+            // 保存当前js -> vnode后新的vnode
         vm._vnode = vnode
-        // Vue.prototype.__patch__ is injected in entry points
-        // based on the rendering backend used.
-        // 当组件 第一次创建的时候
+            // Vue.prototype.__patch__ is injected in entry points
+            // based on the rendering backend used.
+            // 当组件 第一次创建的时候
         if (!prevVnode) {
             // initial render
             vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */ )
@@ -92,7 +92,7 @@ export function lifecycleMixin(Vue: Class < Component > ) {
             vm.$el = vm.__patch__(prevVnode, vnode)
         }
         activeInstance = prevActiveInstance
-        // update __vue__ reference
+            // update __vue__ reference
         if (prevEl) {
             prevEl.__vue__ = null
         }
@@ -121,7 +121,7 @@ export function lifecycleMixin(Vue: Class < Component > ) {
         }
         callHook(vm, 'beforeDestroy')
         vm._isBeingDestroyed = true
-        // remove self from parent
+            // remove self from parent
         const parent = vm.$parent
         if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
             remove(parent.$children, vm)
@@ -141,13 +141,13 @@ export function lifecycleMixin(Vue: Class < Component > ) {
         }
         // call the last hook...
         vm._isDestroyed = true
-        // invoke destroy hooks on current rendered tree
+            // invoke destroy hooks on current rendered tree
         vm.__patch__(vm._vnode, null)
-        // fire destroyed hook
+            // fire destroyed hook
         callHook(vm, 'destroyed')
-        // turn off all instance listeners.
+            // turn off all instance listeners.
         vm.$off()
-        // remove __vue__ reference
+            // remove __vue__ reference
         if (vm.$el) {
             vm.$el.__vue__ = null
         }
@@ -173,8 +173,8 @@ export function mountComponent(
     hydrating ? : boolean
 ): Component {
     vm.$el = el
-    // 判断此时是否存在render 函数，
-    // Vue中不管是通过el,template,render() 3种方式中的一种去获取模板的 都在最后将其转换成render函数，
+        // 判断此时是否存在render 函数，
+        // Vue中不管是通过el,template,render() 3种方式中的一种去获取模板的 都在最后将其转换成render函数，
     if (!vm.$options.render) {
         vm.$options.render = createEmptyVNode
         if (process.env.NODE_ENV !== 'production') {
@@ -200,7 +200,7 @@ export function mountComponent(
     callHook(vm, 'beforeMount')
 
     let updateComponent
-    /* istanbul ignore if */
+        /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         updateComponent = () => {
             const name = vm._name
@@ -300,11 +300,11 @@ export function updateChildComponent(
         for (let i = 0; i < propKeys.length; i++) {
             const key = propKeys[i]
             const propOptions: any = vm.$options.props // wtf flow?
-            // 重新赋值 props 这个就会触发响应式数据的 set方法 从而通知订阅的Watcher进行更新
+                // 重新赋值 props 这个就会触发响应式数据的 set方法 从而通知订阅的Watcher进行更新
             props[key] = validateProp(key, propOptions, propsData, vm)
         }
         toggleObserving(true)
-        // keep a copy of raw propsData
+            // keep a copy of raw propsData
         vm.$options.propsData = propsData
     }
 
@@ -370,9 +370,9 @@ export function deactivateChildComponent(vm: Component, direct ? : boolean) {
 export function callHook(vm: Component, hook: string) {
     // #7573 disable dep collection when invoking lifecycle hooks
     pushTarget()
-    // 获取入参中是否定义了钩子回调函数
+        // 获取入参中是否定义了钩子回调函数
     const handlers = vm.$options[hook]
-    // 定义了钩子
+        // 定义了钩子
     if (handlers) {
         for (let i = 0, j = handlers.length; i < j; i++) {
             try {
