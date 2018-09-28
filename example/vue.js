@@ -6489,7 +6489,6 @@
     var validDivisionCharRE = /[\w).+\-_$\]]/;
 
     function parseFilters(exp) {
-        debugger;
         var inSingle = false;
         var inDouble = false;
         var inTemplateString = false;
@@ -6653,6 +6652,7 @@
         important,
         warn
     ) {
+        debugger;
         modifiers = modifiers || emptyObject;
         // warn prevent and passive modifier
         /* istanbul ignore if */
@@ -9657,6 +9657,7 @@
                         addAttr(el, name, value);
                     }
                 } else if (onRE.test(name)) { // v-on
+                    debugger;
                     name = name.replace(onRE, '');
                     addHandler(el, name, value, modifiers, false, warn$2);
                 } else { // normal directives

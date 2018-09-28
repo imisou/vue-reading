@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <button @click="handleClickSub" @click="handleClickCaptions" @click.capture.stop.once="handleClickSub($event)">handleClickSub</button>
+        <scope-first @select="callbackHandler" @click.native="handleClickScopeFirst"></scope-first>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var scopeFirst = Vue.component('scope-first', {
+    data: function() {
+        return {
+            count: 0
+        }
+    },
+    template: `
+        <div>
+            <button @click="handleClickEmit()">handleClickEmit</button>
+        </div>
+    `,
+    methods: {
+        handleClickEmit() {
+            this.$emit('select', 'name');
+        }
+    },
+    created: function() {
+        this.$on("select", function() {
+            console.log('child select is click');
+        })
+    }
+})
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    data: function() {
+        return {
+            a: {
+                b: function() {
+                    console.log('a.b click is click');
+                }
+            }
+        }
+    },
+    methods: {
+        callbackHandler: function() {
+            console.log('scopeFirst select is click');
+        },
+        handleClickScopeFirst: function() {
+            console.log('handleClickScopeFirst native click is click');
+        },
+        handleClickSub() {
+            console.log('handleClickSub is click');
+        },
+        handleClickCaptions() {
+            console.log('handleClickCaptions is click');
+        },
+    }
+})
+</script>
+
+</html>

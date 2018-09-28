@@ -74,14 +74,18 @@ export function addDirective(
 
 
 /**
- *   向el中添加 事件属性 AST的值
+ *   向el中添加 事件属性 AST的值, 将事件属性转换成 el.events 或 el.nativaEvent属性
  * 
- *   涉及到的属性有   el.nativeEvents el.events
- * 
- *   events对象 = {
- *      'click' : {
- *           value  : value,         //函数处理方法
- *           modifiers : modifiers    //属性描述对象
+ *   涉及到的属性有   el.nativeEvents  el.events
+
+ <button @click.capture="handleClickSub" @click.capture="handleClickCaptions" @click.stop.once="handleClickSub($event)">handleClickSub</button>
+
+    中的 @click.capture.stop.once="handleClickSub($event)"为例
+
+ *   events对象 | nativeEvents = {
+ *      '~!click' : {
+ *           value  : handleClickSub($event),         //函数处理方法
+ *           modifiers : { capture : true stop : true , once : true }    //属性描述对象
  *      },
  *      '!click': [{} ,{} {} ]   先后顺序 和 important决定触发顺序
  *   }
@@ -103,6 +107,7 @@ export function addHandler(
     warn ? : Function
 ) {
     // 事件的描述对象
+    // @click.capture.stop.once="handleClickSub($event)" 存在两个描述对象 {capture : true stop : true , once : true }
     modifiers = modifiers || emptyObject
         // warn prevent and passive modifier
         /* istanbul ignore if */
@@ -117,11 +122,12 @@ export function addHandler(
     }
 
     // check capture modifier
-    // 处理事件的caption 描述符  
+    // 处理事件的caption 描述符  存在capture 修饰符  name = "!click"
     if (modifiers.capture) {
         delete modifiers.capture
         name = '!' + name // mark the event as captured
     }
+    // 上面存在 once 描述符  name = '~!click'
     if (modifiers.once) {
         delete modifiers.once
         name = '~' + name // mark the event as once
@@ -147,7 +153,10 @@ export function addHandler(
     }
 
     // 处理 @click.native  native描述符
+    // 对于组件上面定义的事件有两种  自定义事件 : @event1="" , 原生事件  @click.native="xxx"
+    // 对于普通元素 其只有原生的DOM事件  其定义方法 @click="cccc" 
     let events
+    // 所以对于组件上的自定义事件  其保存在AST对象的 nativeEvents属性上
     if (modifiers.native) {
         delete modifiers.native
         // 初始化 事件保存的 地方
@@ -156,9 +165,11 @@ export function addHandler(
         events = el.events || (el.events = {})
     }
 
+    // 定义AST对象上 events 或者 nativeEvents属性 上的值
     const newHandler: any = {
         value: value.trim()
     }
+    // 如果此事件存在修饰符  那么保存的对象为  { value : "handleClickSub($event)" , modifiers : { capture : true stop : true , once : true }}
     if (modifiers !== emptyObject) {
         newHandler.modifiers = modifiers
     }
@@ -177,8 +188,6 @@ export function addHandler(
     } else {
         events[name] = newHandler
     }
-
-
 
     el.plain = false
 }
