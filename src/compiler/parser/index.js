@@ -540,6 +540,7 @@ type ForParseResult = {
 export function parseFor(exp: string): ? ForParseResult {
     // '(item,index) in arr'
     //   [ '(item,index) in arr'  , '(item,index)' , 'arr', index: 0,input : '(item,index) in arr' ]
+    // 通过 in | of 来分割 值
     const inMatch = exp.match(forAliasRE)
     if (!inMatch) return
     const res = {}

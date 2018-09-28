@@ -78,6 +78,7 @@ export function parseText(
             tokens.push(JSON.stringify(tokenValue))
         }
         // tag token
+        // 解析过滤器
         const exp = parseFilters(match[1].trim())
         //生成当前参数在Vue render中获取响应式数据的方法  _s('obj.name')  => this['obj.name']
         tokens.push(`_s(${exp})`)

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+        <div v-if="testIf === 1">if</div>
+        <div v-else-if="testIf === 2">elseif</div>
+        <div v-else>else</div>
+        <template v-if="loginType === 'username'">
+            <label>Username</label>
+            <input placeholder="Enter your username" key="username-input">
+        </template>
+        <template v-else>
+            <label>Email</label>
+            <input placeholder="Enter your email address" key="email-input">
+        </template>
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+
+    data: function() {
+        return {
+            testIf: 2,
+            loginType : 'username'
+        }
+    },
+    methods: {
+        toggleShow: function() {
+            this.isShow = !this.isShow;
+        }
+    }
+})
+</script>
+
+</html>

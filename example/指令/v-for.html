@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+<div id="app">
+    <div v-for="(item, index) in items" :key="item.id">
+        <p>{{item.value + '---' + index}}</p>
+    </div>
+    <div v-for="(val, key) in object" :key="key">
+        <p>{{val + '---' + key }}</p>
+    </div>
+    <div v-for="(val, key, index) in object1" :key="key">
+        <p>{{val + '---' + key + ' --- ' + index}}</p>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+var vue = new Vue({
+    name: "App",
+    el: "#app",
+    data: function() {
+        return {
+            items : [{
+                id : 1,
+                value : 1
+            },{
+                id : 2,
+                value : 2
+            }],
+            object:{
+                name : 'gzh',
+                age : 26
+            },
+             object1:{
+                name1 : 'gzh',
+                age1 : 26
+            }
+        }
+    },
+    methods: {
+        toggleShow: function() {
+            this.isShow = !this.isShow;
+        }
+    }
+})
+</script>
+
+</html>
