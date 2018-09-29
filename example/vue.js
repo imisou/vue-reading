@@ -6652,7 +6652,6 @@
         important,
         warn
     ) {
-        debugger;
         modifiers = modifiers || emptyObject;
         // warn prevent and passive modifier
         /* istanbul ignore if */
@@ -9657,7 +9656,7 @@
                         addAttr(el, name, value);
                     }
                 } else if (onRE.test(name)) { // v-on
-                    debugger;
+   
                     name = name.replace(onRE, '');
                     addHandler(el, name, value, modifiers, false, warn$2);
                 } else { // normal directives
@@ -10118,6 +10117,7 @@
             var genModifierCode = '';
             var keys = [];
             for (var key in handler.modifiers) {
+                debugger;
                 if (modifierCode[key]) {
                     genModifierCode += modifierCode[key];
                     // left/right
@@ -10133,6 +10133,7 @@
                         .join('||')
                     );
                 } else {
+                    
                     keys.push(key);
                 }
             }

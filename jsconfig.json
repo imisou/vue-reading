@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "core/*": ["src/core/*"],
+            "web/*": ["src/platforms/web/*"],
+            "shared/*": ["src/shared/*"],
+            "compiler/*": ["src/compiler/*"]
+        }
+}

@@ -136,6 +136,22 @@ function genWeexHandler(params: Array < any > , handlerCode: string) {
             stop : true
         }
     }
+
+    // 最重要的是事件的修饰符
+    
+    事件修饰符:
+        .stop   .prevent  .capture  .self  .once  .passive
+
+    按键修饰符:
+        数字类型  :  37 , 64
+        按键的别名 : .enter 、 .tab 、.delete (捕获“删除”和“退格”键) 、 .esc 、 .space 、.up 、.down 、 .left 、 .right
+    
+    系统修饰键 :
+        .ctrl  、 .alt 、 .shift 、 .meta 、 .exact
+    
+    鼠标按钮修饰符 :
+        .left 、 .right 、 .middle
+
 */
 function genHandler(
     name: string, // name ： "!click"
@@ -179,14 +195,20 @@ function genHandler(
         for (const key in handler.modifiers) {
             // 如 stop , 在Vue中定义了各修饰符 的处理方法 
             // 如 stop :  '$event.stopPropagation();'
+            // 处理 stop prevent self ctrl shift alt meta left middle right
             if (modifierCode[key]) {
                 genModifierCode += modifierCode[key]
-                    // left/right
+
+                // 处理 left 、 right
+                // left/right 
                 if (keyCodes[key]) {
                     keys.push(key)
                 }
+            // 处理 exact
             } else if (key === 'exact') {
+                // exact 修饰符允许你控制由精确的系统修饰符组合触发的事件。
                 const modifiers: ASTModifiers = (handler.modifiers: any)
+
                 genModifierCode += genGuard(
                     ['ctrl', 'shift', 'alt', 'meta']
                     .filter(keyModifier => !modifiers[keyModifier])
@@ -194,6 +216,7 @@ function genHandler(
                     .join('||')
                 )
             } else {
+                // 处理 按键修饰符 (数字类型、别名)
                 keys.push(key)
             }
         }
@@ -217,17 +240,36 @@ function genHandler(
     }
 }
 
+
+/**
+ * 处理 @keyup.alt.67 这种 67 按键
+ * 
+ * 
+ * @param {*} keys 
+ */
 function genKeyFilter(keys: Array < string > ): string {
+    //  if (!("button" in $event) && $event.keyCode !== 67)
     return `if(!('button' in $event)&&${keys.map(genFilterCode).join('&&')})return null;`
 }
 
+/**
+ * 按键类型 
+ * @param {*} key 
+ */
 function genFilterCode(key: string): string {
+    // 
     const keyVal = parseInt(key, 10)
+    // 如果是数字类型   $event.keyCode !== 67
     if (keyVal) {
         return `$event.keyCode!==${keyVal}`
     }
+    // 如果不是数字类型，如设置的按键别名
+    // 'esc'   =>  27
     const keyCode = keyCodes[key]
+    // ['Esc', 'Escape']
     const keyName = keyNames[key]
+    // 调用系统内置 _f()方法
+    // _k($event.keyCode,'esc' , 27 , $event.key , ['Esc', 'Escape'])
     return (
         `_k($event.keyCode,` +
         `${JSON.stringify(key)},` +

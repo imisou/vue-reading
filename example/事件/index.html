@@ -9,6 +9,14 @@
 <body>
     <div id="app">
         <button @click="handleClickSub" @click="handleClickCaptions" @click.capture.stop.once="handleClickSub($event)">handleClickSub</button>
+        <div @keyup.alt.67="handleClickCaptions">handleClickCaptions</div>
+      
+        <!-- 即使 Alt 或 Shift 被一同按下时也会触发 -->
+        <button @click.ctrl="handleClickCaptions">A</button>
+        <!-- 有且只有 Ctrl 被按下的时候才触发 -->
+        <button @click.ctrl.exact="handleClickCaptions">A</button>
+        <!-- 没有任何系统修饰符被按下的时候才触发 -->
+        <button @click.exact="handleClickCaptions">A</button>
         <scope-first @select="callbackHandler" @click.native="handleClickScopeFirst"></scope-first>
     </div>
 </body>
