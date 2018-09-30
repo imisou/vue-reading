@@ -38,6 +38,8 @@ function createOnceHandler(handler, event, capture) {
     }
 }
 
+
+
 function add(
     event: string,
     handler: Function,
@@ -72,6 +74,11 @@ function remove(
 
 /**
     对于事件的运行期间的处理是通过 vnode -> dom的时候，在各个生命周期期间调用各生命周期间定义的钩子函数
+
+    对于vnode 其
+
+    此处处理的是节点上的真实DOM事件，如果是组件占位符节点上定义的
+
     {
 		on: {
 			click: handleClickSub,

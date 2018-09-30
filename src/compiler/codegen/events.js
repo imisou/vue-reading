@@ -4,7 +4,7 @@
 const fnExpRE = /^([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/
 
 
-// 匹配 a.b  a['b']  a["b"] a[0] a[b]
+// 匹配 a a.b  a['b']  a["b"] a[0] a[b]
 const simplePathRE = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['[^']*?']|\["[^"]*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*$/
 
 // KeyboardEvent.keyCode aliases
@@ -157,87 +157,83 @@ function genHandler(
     name: string, // name ： "!click"
     handler: ASTElementHandler | Array < ASTElementHandler > // handler { value: "handleClickSub", modifiers: {} }
 ): string {
-    if (!handler) {
-        return 'function(){}'
+
+if (!handler) {
+    return 'function(){}'
+}
+// 如果事件处理函数为数组类型  说明定义了相同的事件
+if (Array.isArray(handler)) {
+    return `[${handler.map(handler => genHandler(name, handler)).join(',')}]`
+}
+// 解析事件的处理回调函数 
+// 判断其是否是 handleClickSub 或者  a.b  a['b']  a["b"] a[0] a[b]
+const isMethodPath = simplePathRE.test(handler.value)
+// 事件回调函数  为  function(){} 或者 () => { xxxx }
+const isFunctionExpression = fnExpRE.test(handler.value)
+// 没有修饰符 并不代表真正的没有修饰符，而是不需要再 generate期间 处理的修饰符，如 .native .capture .once .passive .right .middle
+if (!handler.modifiers) {
+    // 且为简单的回调函数类型就行  因为上面两种  直接可以 handler.value() 回调执行
+    if (isMethodPath || isFunctionExpression) {
+        return handler.value
     }
-    // 如果事件处理函数为数组类型  说明定义了相同的事件
-    if (Array.isArray(handler)) {
-        return `[${handler.map(handler => genHandler(name, handler)).join(',')}]`
+    /* istanbul ignore if */
+    if (__WEEX__ && handler.params) {
+        return genWeexHandler(handler.params, handler.value)
     }
-
-    // 解析事件的处理回调函数 
-    // 判断其是否是 handleClickSub 或者  a.b  a['b']  a["b"] a[0] a[b]
-    const isMethodPath = simplePathRE.test(handler.value)
-    // 事件回调函数  为  function(){} 或者 () => { xxxx }
-    const isFunctionExpression = fnExpRE.test(handler.value)
-
-    // 没有修饰符 
-    if (!handler.modifiers) {
-        // 且为简单的回调函数类型就行  因为上面两种  直接可以 handler.value() 回调执行
-        if (isMethodPath || isFunctionExpression) {
-            return handler.value
-        }
-        /* istanbul ignore if */
-        if (__WEEX__ && handler.params) {
-            return genWeexHandler(handler.params, handler.value)
-        }
-        // 不然对于  如 handleClickSub($event)  "target = $event" 这种就需要用一层函数去包裹
-        //  function($event){ handleClickSub($event) }
-        //  function($event){ target = $event }
-        return `function($event){${handler.value}}` // inline statement
-    } else {
-        // 如果存在修饰符  在parse的时候我们处理了如 capture , once , native , right , passive; 但是还有其他的修饰符 如 stop , self
-
-        let code = ''
-        let genModifierCode = ''
-        const keys = []
-        // 处理上面的遗留的修饰符
-        for (const key in handler.modifiers) {
-            // 如 stop , 在Vue中定义了各修饰符 的处理方法 
-            // 如 stop :  '$event.stopPropagation();'
-            // 处理 stop prevent self ctrl shift alt meta left middle right
-            if (modifierCode[key]) {
-                genModifierCode += modifierCode[key]
-
-                // 处理 left 、 right
-                // left/right 
-                if (keyCodes[key]) {
-                    keys.push(key)
-                }
-            // 处理 exact
-            } else if (key === 'exact') {
-                // exact 修饰符允许你控制由精确的系统修饰符组合触发的事件。
-                const modifiers: ASTModifiers = (handler.modifiers: any)
-
-                genModifierCode += genGuard(
-                    ['ctrl', 'shift', 'alt', 'meta']
-                    .filter(keyModifier => !modifiers[keyModifier])
-                    .map(keyModifier => `$event.${keyModifier}Key`)
-                    .join('||')
-                )
-            } else {
-                // 处理 按键修饰符 (数字类型、别名)
+    // 不然对于  如 handleClickSub($event)  "target = $event" 这种就需要用一层函数去包裹
+    //  function($event){ handleClickSub($event) }
+    //  function($event){ target = $event }
+    return `function($event){${handler.value}}` // inline statement
+} else {
+    // 如果存在修饰符  在parse的时候我们处理了如 capture , once , native , right , passive; 但是还有其他的修饰符 如 stop , self
+    let code = ''
+    let genModifierCode = ''
+    const keys = []
+    // 处理上面的遗留的修饰符
+    for (const key in handler.modifiers) {
+        // 如 stop , 在Vue中定义了各修饰符 的处理方法 
+        // 如 stop :  '$event.stopPropagation();'
+        // 处理 stop prevent self ctrl shift alt meta left middle right
+        if (modifierCode[key]) {
+            genModifierCode += modifierCode[key]
+            // 处理 left 、 right
+            // left/right 
+            if (keyCodes[key]) {
                 keys.push(key)
             }
+        // 处理 exact
+        } else if (key === 'exact') {
+            // exact 修饰符允许你控制由精确的系统修饰符组合触发的事件。
+            const modifiers: ASTModifiers = (handler.modifiers: any)
+            genModifierCode += genGuard(
+                ['ctrl', 'shift', 'alt', 'meta']
+                .filter(keyModifier => !modifiers[keyModifier])
+                .map(keyModifier => `$event.${keyModifier}Key`)
+                .join('||')
+            )
+        } else {
+            // 处理 按键修饰符 (数字类型、别名)
+            keys.push(key)
         }
-        if (keys.length) {
-            code += genKeyFilter(keys)
-        }
-        // Make sure modifiers like prevent and stop get executed after key filtering
-        if (genModifierCode) {
-            code += genModifierCode
-        }
-        const handlerCode = isMethodPath ?
-            `return ${handler.value}($event)` :
-            isFunctionExpression ?
-            `return (${handler.value})($event)` :
-            handler.value
-            /* istanbul ignore if */
-        if (__WEEX__ && handler.params) {
-            return genWeexHandler(handler.params, code + handlerCode)
-        }
-        return `function($event){${code}${handlerCode}}`
     }
+    if (keys.length) {
+        code += genKeyFilter(keys)
+    }
+    // Make sure modifiers like prevent and stop get executed after key filtering
+    if (genModifierCode) {
+        code += genModifierCode
+    }
+    const handlerCode = isMethodPath ?
+        `return ${handler.value}($event)` :
+        isFunctionExpression ?
+        `return (${handler.value})($event)` :
+        handler.value
+        /* istanbul ignore if */
+    if (__WEEX__ && handler.params) {
+        return genWeexHandler(handler.params, code + handlerCode)
+    }
+    return `function($event){${code}${handlerCode}}`
+}
 }
 
 
