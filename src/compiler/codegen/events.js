@@ -170,6 +170,7 @@ if (Array.isArray(handler)) {
 const isMethodPath = simplePathRE.test(handler.value)
 // 事件回调函数  为  function(){} 或者 () => { xxxx }
 const isFunctionExpression = fnExpRE.test(handler.value)
+
 // 没有修饰符 并不代表真正的没有修饰符，而是不需要再 generate期间 处理的修饰符，如 .native .capture .once .passive .right .middle
 if (!handler.modifiers) {
     // 且为简单的回调函数类型就行  因为上面两种  直接可以 handler.value() 回调执行
@@ -259,6 +260,19 @@ function genFilterCode(key: string): string {
     if (keyVal) {
         return `$event.keyCode!==${keyVal}`
     }
+
+
+
+    /*
+        处理 按键别名修饰符
+
+        如 'esc'
+        => _k( $event.keyCode , 'esc' , 27 , $event.key , ['Esc', 'Escape'])
+
+        如果是自定义的按键别名
+        如  'f1'
+        => _k( $event.keyCode , 'f1' , '' , $event.key , '' )
+     */
     // 如果不是数字类型，如设置的按键别名
     // 'esc'   =>  27
     const keyCode = keyCodes[key]

@@ -21,6 +21,8 @@ export function installRenderHelpers (target: any) {
   target._i = looseIndexOf
   target._m = renderStatic
   target._f = resolveFilter
+
+  // 事件 别名按键修饰符处理
   target._k = checkKeyCodes
   target._b = bindObjectProps
   // 创建一个文本vnode
