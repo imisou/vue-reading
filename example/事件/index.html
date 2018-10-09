@@ -17,6 +17,11 @@
         <button @click.ctrl.exact="handleClickCaptions">A</button>
         <!-- 没有任何系统修饰符被按下的时候才触发 -->
         <button @click.exact="handleClickCaptions">A</button>
+
+        <button @click.esc="handleClickCaptions">A</button>
+        <button @click.tab="handleClickCaptions">A</button>
+        <button @click.f12="handleClickCaptions">A</button>
+
         <scope-first @select="callbackHandler" @click.native="handleClickScopeFirst"></scope-first>
     </div>
 </body>
@@ -44,6 +49,11 @@ var scopeFirst = Vue.component('scope-first', {
         })
     }
 })
+
+Vue.config.keyCodes = {
+    "tab" : 113,
+    "f12":112
+}
 var vue = new Vue({
     name: "App",
     el: "#app",

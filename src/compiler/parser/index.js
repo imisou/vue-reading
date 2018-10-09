@@ -875,7 +875,7 @@ function processAttrs(el) {
                     // 添加 到 el.attrs 属性数组中 [{ title : value }]
                     addAttr(el, name, value)
                 }
-            } else if (onRE.test(name)) { // v-on
+            } else if (onRE.test(name)) { // v-on 或者 @
                 // 处理 v-on 或者 @ 属性  如 <div v-on:click="xxx" @change="xxx">
                 // v-on:click => click
                 name = name.replace(onRE, '')

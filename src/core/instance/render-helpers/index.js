@@ -24,6 +24,7 @@ export function installRenderHelpers (target: any) {
 
   // 事件 别名按键修饰符处理
   target._k = checkKeyCodes
+  
   target._b = bindObjectProps
   // 创建一个文本vnode
   target._v = createTextVNode

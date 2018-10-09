@@ -3830,6 +3830,7 @@
         eventKeyName,
         builtInKeyName
     ) {
+
         var mappedKeyCode = config.keyCodes[key] || builtInKeyCode;
         if (builtInKeyName && eventKeyName && !config.keyCodes[key]) {
             return isKeyNotMatch(builtInKeyName, eventKeyName)
@@ -10117,7 +10118,7 @@
             var genModifierCode = '';
             var keys = [];
             for (var key in handler.modifiers) {
-                debugger;
+           
                 if (modifierCode[key]) {
                     genModifierCode += modifierCode[key];
                     // left/right
