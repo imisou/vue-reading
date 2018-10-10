@@ -82,13 +82,13 @@ export function addDirective(
 
     中的 @click.capture.stop.once="handleClickSub($event)"为例
 
- *   events对象 | nativeEvents = {
- *      '~!click' : {
- *           value  : handleClickSub($event),         //函数处理方法
- *           modifiers : { capture : true stop : true , once : true }    //属性描述对象
- *      },
- *      '!click': [{} ,{} {} ]   先后顺序 和 important决定触发顺序
- *   }
+events对象 | nativeEvents = {
+  '~!click' : {
+       value  : handleClickSub($event),         //函数处理方法
+       modifiers : { capture : true stop : true , once : true }    //属性描述对象
+  },
+  '!click': [{} ,{} {} ]   先后顺序 和 important决定触发顺序
+}
  *   
  * 
  * @param {*} el              AST对象

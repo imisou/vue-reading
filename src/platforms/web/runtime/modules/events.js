@@ -39,7 +39,15 @@ function createOnceHandler(handler, event, capture) {
 }
 
 
-
+/**
+ * @description 添加一个事件回调函数
+ * @author guzhanghua
+ * @param {string} event      事件的名称
+ * @param {Function} handler  事件的处理方法
+ * @param {boolean} once      修饰符once   
+ * @param {boolean} capture   修饰符capture
+ * @param {boolean} passive   修饰符passive
+ */
 function add(
     event: string,
     handler: Function,

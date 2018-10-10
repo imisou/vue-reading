@@ -97,6 +97,8 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 /**
  * Wrap a function so that if any code inside triggers state change,
  * the changes are queued using a (macro) task instead of a microtask.
+ * 
+ * 
  */
 export function withMacroTask(fn: Function): Function {
     return fn._withTask || (fn._withTask = function() {
