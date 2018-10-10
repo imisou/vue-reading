@@ -13,67 +13,120 @@ Vue.js源码的分析过程，详细记录了Vue源码阅读过程中的所有�
 ### doc : 阅读期间的总结笔记
 
 1. 组件部分
-    1.1 functional 函数式组件
+
+    1. functional 函数式组件
+    
         ☐ 文档编写  
-    1.2 slot 插槽
+
+    2. slot 插槽
+
         ✔ 文档编写 @done (9/26/2018, 3:06:39 PM)
+
         ☐ 插槽作用域（更新流程）
 
 2. 属性描述符
-    2.1 prop
+
+    1. prop
+
         ✔ 基本文档完成 @done (9/27/2018, 3:56:55 PM)
+
         ☐ 详解prop描述符的 textContent 与 value在dom-props.js中的处理方式
 
 3. 指令部分
-    3.1 指令流程
+
+    0. 指令流程
+
         ✔ 源码分析 @done (9/27/2018, 9:10:08 PM)
+
         ✔ 文档编写 @done (9/27/2018, 9:10:12 PM)
-    3.1 v-text
+
+    1. v-text
+
         ✔ 文档 @done (9/27/2018, 3:57:46 PM)
-    3.2 v-html
+
+    2. v-html
+
         ✔ 源码分析 @done (9/27/2018, 9:10:19 PM)
+
         ✔ 文档编写 @done (9/27/2018, 9:10:20 PM)
-    3.3 v-show
+
+    3. v-show
+
         ☐ 源码分析
+
         ☐ 文档编写
+
         ☐ v-show 与 transition 结合使用
-    3.4 v-if、v-else-if、v-else
+
+    4. v-if、v-else-if、v-else
+
         ☐ 源码分析
+
         ☐ 文档编写
-    3.5 v-for
+
+    5. v-for
+
         ☐ 源码分析
+
         ☐ 文档编写
-    3.6 v-bind
+
+    6. v-bind
+
         ☐ 源码分析
+
         ☐ 文档编写
-    3.7 v-model
+
+    7. v-model
+
         ☐ 源码分析
+
         ☐ 文档编写
-    3.8 v-pre
+
+    8. v-pre
+
         ✔ 源码分析 @done (9/27/2018, 9:10:50 PM)
+
         ✔ 文档编写 @done (9/27/2018, 9:10:52 PM)
-    3.9 v-cloak
+
+    9. v-cloak
+
         ☐ 源码分析
+
         ☐ 文档编写
-    3.10 v-once
+
+    10. v-once
+
         ✔ 源码分析 @done (9/27/2018, 9:10:55 PM)
+
         ✔ 文档编写 @done (9/27/2018, 9:10:56 PM)
 
  4. 过滤器
-     ☐ 源码分析
-         ☐ 属性中parseFilter
-         ☐ 文本中parseFilter
-         ☐ _f()
-     ☐ 文档编写
+
+    - 源码分析
+
+        - 属性中parseFilter
+
+        - 文本中parseFilter
+
+        - _f()
+
+    - 文档编写
 
  5. 事件
-     ✔ 5.1 编译阶段 @done (18-10-10 18:59)
-         1. parse阶段
-         2. generate阶段
-     ✔ 5.2 运行阶段 @done (18-10-10 18:59)
-         1. 元素DOM事件
-         2. 组件DOM事件
-         3. 组件自定义事件
+
+        1. 编译阶段 
+
+          - parse阶段
+
+          - generate阶段
+
+        2. 运行阶段
+
+         - 元素DOM事件
+
+         - 组件DOM事件
+
+         - 组件自定义事件
 
     
 
