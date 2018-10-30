@@ -2657,7 +2657,7 @@
     function lifecycleMixin(Vue) {
         Vue.prototype._update = function(vnode, hydrating) {
             var vm = this;
-           
+             debugger;
             var prevEl = vm.$el;
             var prevVnode = vm._vnode;
             var prevActiveInstance = activeInstance;
@@ -6118,7 +6118,8 @@
             }
         }
 
-        return function patch(oldVnode, vnode, hydrating, removeOnly) {      
+        return function patch(oldVnode, vnode, hydrating, removeOnly) {   
+              debugger;   
             if (isUndef(vnode)) {
                 if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
                 return
@@ -10918,7 +10919,7 @@
     ) {
 
         var ast = parse(template.trim(), options);
-        debugger;
+        
         if (options.optimize !== false) {
             optimize(ast, options);
         }

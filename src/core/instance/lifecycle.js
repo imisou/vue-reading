@@ -60,39 +60,37 @@ export function lifecycleMixin(Vue: Class < Component > ) {
     /*
         可见 _update()方法触发的时机有两种。
         1、 当组件初始化渲染的时候 此时组件从AST -> VNode 但是没有生成DOM元素 此时触发_update 进行 VNode -> DOM的过程
-
-
         2、 当组件发生更新的时候  此时响应式数据触发 set方法 然后 dep.notify() 去通知渲染Watcher进行重新getter方法
         此时也会触发 _update() 方法
      */
     Vue.prototype._update = function(vnode: VNode, hydrating ? : boolean) {
-        const vm: Component = this
-            // 保存组件 原来的dom
-        const prevEl = vm.$el
-            // 保存原来的 组件vnode
-            // 对于更新的情况  因为组件已经生成过 所以触发了 vm._vnode = vnode 所以此时prevVnode 不会空
-        const prevVnode = vm._vnode
-            // activeInstance是相当于全局属性，用来保存当前正在处理的组件vm，而此时进行 _update() 所以需要保存原来正在处理的vm，
-            // 保存原来处理的组件
-        const prevActiveInstance = activeInstance
-            // 赋值activeInstance 保存当前正在处理的组件vm
-        activeInstance = vm
-            // 是的组件上的_vnode 等于 组件vnode
-            // 保存当前js -> vnode后新的vnode
-        vm._vnode = vnode
-            // Vue.prototype.__patch__ is injected in entry points
-            // based on the rendering backend used.
-            // 当组件 第一次创建的时候
+        const vm: Component = this;
+        // 保存组件 原来的dom
+        const prevEl = vm.$el;
+        // 保存原来的 组件vnode
+        // 对于更新的情况  因为组件已经生成过 所以触发了 vm._vnode = vnode 所以此时prevVnode 不会空
+        const prevVnode = vm._vnode;
+        // activeInstance是相当于全局属性，用来保存当前正在处理的组件vm，而此时进行 _update() 所以需要保存原来正在处理的vm，
+        // 保存原来处理的组件
+        const prevActiveInstance = activeInstance;
+        // 赋值activeInstance 保存当前正在处理的组件vm
+        activeInstance = vm;
+        // 是的组件上的_vnode 等于 组件vnode
+        // 保存当前js -> vnode后新的vnode
+        vm._vnode = vnode;
+        // Vue.prototype.__patch__ is injected in entry points
+        // based on the rendering backend used.
+        // 当组件 第一次创建的时候
         if (!prevVnode) {
             // initial render
-            vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */ )
+            vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */ );
         } else {
             // 当组件更新的时候触发 preVnode 为旧的组件VNode vnode为新render生成的VNode
             // updates
             vm.$el = vm.__patch__(prevVnode, vnode)
         }
-        activeInstance = prevActiveInstance
-            // update __vue__ reference
+        activeInstance = prevActiveInstance;
+        // update __vue__ reference
         if (prevEl) {
             prevEl.__vue__ = null
         }
@@ -114,14 +112,21 @@ export function lifecycleMixin(Vue: Class < Component > ) {
         }
     }
 
+    /*
+        组件卸载实例方法。在组件卸载钩子函数 data.hook.destory中也是调用此 方法去卸载组件
+    */
     Vue.prototype.$destroy = function() {
         const vm: Component = this
+
+        // 如果组件在卸载那么此时就return
         if (vm._isBeingDestroyed) {
             return
         }
+        // 调用组件 beforeDestory 的生命周期函数
         callHook(vm, 'beforeDestroy')
-        vm._isBeingDestroyed = true
-            // remove self from parent
+        vm._isBeingDestroyed = true;
+
+        // remove self from parent
         const parent = vm.$parent
         if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
             remove(parent.$children, vm)
@@ -173,8 +178,9 @@ export function mountComponent(
     hydrating ? : boolean
 ): Component {
     vm.$el = el
-        // 判断此时是否存在render 函数，
-        // Vue中不管是通过el,template,render() 3种方式中的一种去获取模板的 都在最后将其转换成render函数，
+
+    // 判断此时是否存在render 函数，
+    // Vue中不管是通过el,template,render() 3种方式中的一种去获取模板的 都在最后将其转换成render函数，
     if (!vm.$options.render) {
         vm.$options.render = createEmptyVNode
         if (process.env.NODE_ENV !== 'production') {

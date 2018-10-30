@@ -37,7 +37,7 @@ export function initExtend(Vue: GlobalAPI) {
 
         // 定义 组件的构造函数
         const Sub = function VueComponent(options) {
-            this._init(options)
+            this.  (options)
         }
         // 原型的继承
         Sub.prototype = Object.create(Super.prototype)

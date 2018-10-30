@@ -230,135 +230,141 @@ export function createPatchFunction(backend) {
      * @param  {[type]} index              [description]
      * @return {[type]}                    [description]
      */
-function createElm(
-    vnode,
-    insertedVnodeQueue,
-    parentElm,
-    refElm,
-    nested,
-    ownerArray,
-    index
-) {
-    if (isDef(vnode.elm) && isDef(ownerArray)) {
-        // This vnode was used in a previous render!
-        // now it's used as a new node, overwriting its elm would cause
-        // potential patch errors down the road when it's used as an insertion
-        // reference node. Instead, we clone the node on-demand before creating
-        // associated DOM element for it.
-        vnode = ownerArray[index] = cloneVNode(vnode)
-    }
-    // 是否是嵌套的内部组件
-    vnode.isRootInsert = !nested // for transition enter check
+    function createElm(
+        vnode,
+        insertedVnodeQueue,
+        parentElm,
+        refElm,
+        nested,
+        ownerArray,
+        index
+    ) {
+        if (isDef(vnode.elm) && isDef(ownerArray)) {
+            // This vnode was used in a previous render!
+            // now it's used as a new node, overwriting its elm would cause
+            // potential patch errors down the road when it's used as an insertion
+            // reference node. Instead, we clone the node on-demand before creating
+            // associated DOM element for it.
+            vnode = ownerArray[index] = cloneVNode(vnode)
+        }
+        // 是否是嵌套的内部组件
+        vnode.isRootInsert = !nested // for transition enter check
+
         // 如果为true 说明 此当前处理的vnode是一个组件
         // 如果是undefined 说明当前处理的vnode为元素节点
-    if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
-        return
-    }
-    // 元素节点 保存其data数据
-    const data = vnode.data
+        if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
+            return
+        }
+        // 元素节点 保存其data数据
+        const data = vnode.data
+
         // 获取其子vnode
-    const children = vnode.children
-    const tag = vnode.tag
+        const children = vnode.children
+        const tag = vnode.tag
+
         // 如果是一个元素节点
         // 对于非组件节点
         // 那么节点只能是  三种 ： 元素节点 注释节点 或者 文本节点
         // 元素节点 ： 其可能存在子节点  或元素节点或注释或文本，所以需要createChildren 处理子节点
         // 注释节点 ： 直接调用创建注释节点的方法去生成一个注释节点 然后插入
         // 文本节点 ： 跟注释节点一样
-    if (isDef(tag)) {
-        if (process.env.NODE_ENV !== 'production') {
-            if (data && data.pre) {
-                creatingElmInVPre++
+        if (isDef(tag)) {
+            if (process.env.NODE_ENV !== 'production') {
+                if (data && data.pre) {
+                    creatingElmInVPre++
+                }
+                if (isUnknownElement(vnode, creatingElmInVPre)) {
+                    warn(
+                        'Unknown custom element: <' + tag + '> - did you ' +
+                        'register the component correctly? For recursive components, ' +
+                        'make sure to provide the "name" option.',
+                        vnode.context
+                    )
+                }
             }
-            if (isUnknownElement(vnode, creatingElmInVPre)) {
-                warn(
-                    'Unknown custom element: <' + tag + '> - did you ' +
-                    'register the component correctly? For recursive components, ' +
-                    'make sure to provide the "name" option.',
-                    vnode.context
-                )
-            }
-        }
-        vnode.elm = vnode.ns ?
-            nodeOps.createElementNS(vnode.ns, tag) :
-            nodeOps.createElement(tag, vnode)
-        setScope(vnode)
-        /* istanbul ignore if */
-        if (__WEEX__) {
-            // in Weex, the default insertion order is parent-first.
-            // List items can be optimized to use children-first insertion
-            // with append="tree".
-            const appendAsTree = isDef(data) && isTrue(data.appendAsTree)
-            if (!appendAsTree) {
-                // data中保存了元素的属性，所以如果 data不为空就需要处理元素上的属性
+            // 创建当前 节点元素
+            vnode.elm = vnode.ns ?
+                nodeOps.createElementNS(vnode.ns, tag) :
+                nodeOps.createElement(tag, vnode)
+                
+            setScope(vnode)
+                /* istanbul ignore if */
+            if (__WEEX__) {
+                // in Weex, the default insertion order is parent-first.
+                // List items can be optimized to use children-first insertion
+                // with append="tree".
+                const appendAsTree = isDef(data) && isTrue(data.appendAsTree)
+                if (!appendAsTree) {
+                    // data中保存了元素的属性，所以如果 data不为空就需要处理元素上的属性
+                    if (isDef(data)) {
+                        // 在 createPatchFunction() 的时候 cbs保存了元素在各个阶段属性的处理方法
+                        invokeCreateHooks(vnode, insertedVnodeQueue)
+                    }
+                    insert(parentElm, vnode.elm, refElm)
+                }
+                createChildren(vnode, children, insertedVnodeQueue)
+                if (appendAsTree) {
+                    if (isDef(data)) {
+                        invokeCreateHooks(vnode, insertedVnodeQueue)
+                    }
+                    insert(parentElm, vnode.elm, refElm)
+                }
+            } else {
+                // 处理子节点
+                createChildren(vnode, children, insertedVnodeQueue)
                 if (isDef(data)) {
-                    // 在 createPatchFunction() 的时候 cbs保存了元素在各个阶段属性的处理方法
                     invokeCreateHooks(vnode, insertedVnodeQueue)
                 }
+                // 在父节点上 插入处理好的此节点
                 insert(parentElm, vnode.elm, refElm)
             }
-            createChildren(vnode, children, insertedVnodeQueue)
-            if (appendAsTree) {
-                if (isDef(data)) {
-                    invokeCreateHooks(vnode, insertedVnodeQueue)
-                }
-                insert(parentElm, vnode.elm, refElm)
+            if (process.env.NODE_ENV !== 'production' && data && data.pre) {
+                creatingElmInVPre--
             }
+            // 如果节点是注释节点
+        } else if (isTrue(vnode.isComment)) {
+            vnode.elm = nodeOps.createComment(vnode.text)
+            insert(parentElm, vnode.elm, refElm)
         } else {
-            // 处理子节点
-            createChildren(vnode, children, insertedVnodeQueue)
-            if (isDef(data)) {
-                invokeCreateHooks(vnode, insertedVnodeQueue)
-            }
-            // 在父节点上 插入处理好的此节点
+            // 其他说明这是一个文本节点
+            vnode.elm = nodeOps.createTextNode(vnode.text)
             insert(parentElm, vnode.elm, refElm)
         }
-        if (process.env.NODE_ENV !== 'production' && data && data.pre) {
-            creatingElmInVPre--
-        }
-        // 如果节点是注释节点
-    } else if (isTrue(vnode.isComment)) {
-        vnode.elm = nodeOps.createComment(vnode.text)
-        insert(parentElm, vnode.elm, refElm)
-    } else {
-        // 其他说明这是一个文本节点
-        vnode.elm = nodeOps.createTextNode(vnode.text)
-        insert(parentElm, vnode.elm, refElm)
     }
-}
-/**
- * 创建组件
- * @param  {[type]} vnode              [组件vnode]
- * @param  {[type]} insertedVnodeQueue [description]
- * @param  {[type]} parentElm          [父元素]
- * @param  {[type]} refElm             [兄弟元素]
- * @return {[type]}                    [description]
- */
-function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
-    let i = vnode.data
-    if (isDef(i)) {
-        const isReactivated = isDef(vnode.componentInstance) && i.keepAlive
+    /**
+     * 创建组件
+     * @param  {[type]} vnode              [组件vnode]
+     * @param  {[type]} insertedVnodeQueue [description]
+     * @param  {[type]} parentElm          [父元素]
+     * @param  {[type]} refElm             [兄弟元素]
+     * @return {[type]}                    [description]
+     */
+    function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
+        let i = vnode.data
+        if (isDef(i)) {
+            const isReactivated = isDef(vnode.componentInstance) && i.keepAlive
+
             // 在create-component.js 中
-        if (isDef(i = i.hook) && isDef(i = i.init)) {
-            i(vnode, false /* hydrating */ )
-        }
-        // after calling the init hook, if the vnode is a child component
-        // it should've created a child instance and mounted it. the child
-        // component also has set the placeholder vnode's elm.
-        // in that case we can just return the element and be done.
-        // 在调用init钩子之后，如果vnode是一个子组件，它应该已经创建了一个子实例并挂载了它。
-        // 子组件还设置了占位符vnode的elm。
-        // 在这种情况下，我们只需要返回元素就可以了。
-        if (isDef(vnode.componentInstance)) {
-            initComponent(vnode, insertedVnodeQueue)
-            insert(parentElm, vnode.elm, refElm)
-            if (isTrue(isReactivated)) {
-                reactivateComponent(vnode, insertedVnodeQueue, parentElm, refElm)
+            if (isDef(i = i.hook) && isDef(i = i.init)) {
+                i(vnode, false /* hydrating */ )
             }
-            return true
+            // after calling the init hook, if the vnode is a child component
+            // it should've created a child instance and mounted it. the child
+            // component also has set the placeholder vnode's elm.
+            // in that case we can just return the element and be done.
+            // 在调用init钩子之后，如果vnode是一个子组件，它应该已经创建了一个子实例并挂载了它。
+            // 子组件还设置了占位符vnode的elm。
+            // 在这种情况下，我们只需要返回元素就可以了。
+            if (isDef(vnode.componentInstance)) {
+                initComponent(vnode, insertedVnodeQueue)
+                insert(parentElm, vnode.elm, refElm)
+                if (isTrue(isReactivated)) {
+                    reactivateComponent(vnode, insertedVnodeQueue, parentElm, refElm)
+                }
+                return true
+            }
         }
     }
-}
 
     function initComponent(vnode, insertedVnodeQueue) {
         if (isDef(vnode.data.pendingInsert)) {
@@ -514,6 +520,11 @@ function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
         }
     }
 
+    /**
+     * 调用组件卸载的钩子函数  data.hook.destroy
+     * @author guzhanghua
+     * @param {*} vnode
+     */
     function invokeDestroyHook(vnode) {
         let i, j
         const data = vnode.data
@@ -813,10 +824,11 @@ function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
 
         let i
         const data = vnode.data
-            // 在 createComponent的时候我们调用 vnode.data.hook.init ；
-            // 如果新的vnode上存在vnode.data.hook 这就说明这是一个占位符vnode，也就是一个组件
-            // 当我们更新组件的时候我们调用 prepatch
-            // 此处就是  我们 父组件 通过props 去通知子组件更新的开始
+
+        // 在 createComponent的时候我们调用 vnode.data.hook.init ；
+        // 如果新的vnode上存在vnode.data.hook 这就说明这是一个占位符vnode，也就是一个组件
+        // 当我们更新组件的时候我们调用 prepatch
+        // 此处就是  我们 父组件 通过props 去通知子组件更新的开始
         if (isDef(data) && isDef(i = data.hook) && isDef(i = i.prepatch)) {
             i(oldVnode, vnode)
         }
@@ -1029,8 +1041,8 @@ function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
      *    2.1、 sameVnode(oldVnode, vnode) 当前组件节点相同
      *
      *
-     * @param  {[type]} oldVnode   [第一步中oldVnode = div#app 元素 vnode = App组件生成的vnode]
-     * @param  {[type]} vnode      [description]
+     * @param  {[type]} oldVnode   [第一步中oldVnode = div#app 元素 vnode = App组件生成的vnode]  旧的组件vnode
+     * @param  {[type]} vnode      [description]                                              新的组件vnode
      * @param  {[type]} hydrating  [description]
      * @param  {[type]} removeOnly [description]
      * @return {[type]}            [description]

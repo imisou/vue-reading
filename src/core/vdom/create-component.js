@@ -46,11 +46,13 @@ const componentVNodeHooks = {
             const mountedNode: any = vnode // work around flow
             componentVNodeHooks.prepatch(mountedNode, mountedNode)
         } else {
+            // 执行子组件的初始化 _init 过程，但是这时候 $mount 没有执行
             const child = vnode.componentInstance = createComponentInstanceForVnode(
-                    vnode,
-                    activeInstance // 当前正在处理的组件 对于 组件vnode中的组件 activeInstance 都是其父组件
-                )
-                // 调用子组件的 $mount()方法
+                vnode,
+                activeInstance // 当前正在处理的组件 对于 组件vnode中的组件 activeInstance 都是其父组件
+            )
+
+            // 调用子组件的 $mount()方法
             child.$mount(hydrating ? vnode.elm : undefined, hydrating)
         }
     },
@@ -91,6 +93,10 @@ const componentVNodeHooks = {
         }
     },
 
+    /**
+     * 组件卸载时调用的钩子函数
+     * @param {MountedComponentVNode} vnode
+     */
     destroy(vnode: MountedComponentVNode) {
         const { componentInstance } = vnode
         if (!componentInstance._isDestroyed) {
@@ -283,8 +289,9 @@ export function createComponent(
         // extract listeners, since these needs to be treated as
         // child component listeners instead of DOM listeners
         const listeners = data.on
-            // replace with listeners with .native modifier
-            // so it gets processed during parent component patch.
+
+        // replace with listeners with .native modifier
+        // so it gets processed during parent component patch.
         data.on = data.nativeOn
 
         if (isTrue(Ctor.options.abstract)) {
@@ -342,6 +349,7 @@ export function createComponentInstanceForVnode(
         options.render = inlineTemplate.render
         options.staticRenderFns = inlineTemplate.staticRenderFns
     }
+
     // 调用组件的 _init方法
     return new vnode.componentOptions.Ctor(options)
 }

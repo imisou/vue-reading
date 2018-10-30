@@ -14,73 +14,72 @@ let uid = 0
 
 export function initMixin(Vue: Class < Component > ) {
 
-    Vue.prototype._init = function(options ? : Object) {
-        // vm -> this;
-        const vm: Component = this
-        // 我们初始化一个_uid 作为 Vue的唯一ID
-        vm._uid = uid++
-
-            // 进行性能测试
-            let startTag, endTag
-        /* istanbul ignore if */
-        if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
-            startTag = `vue-perf-start:${vm._uid}`
-            endTag = `vue-perf-end:${vm._uid}`
-            mark(startTag)
-        }
-        // 
-        // a flag to avoid this being observed
-        // 表明Vue是Vue对象
-        vm._isVue = true
-        // merge options
-        // 在Vue中我们生成组件其实有两种方式 new Vue() Vue.component()
-        // 如果是Vue.component() 则在执行Vue的静态方法Vue之后会在Option中添加一个属性_isComponent表明这是一个组件
-        if (options && options._isComponent) {
-            // optimize internal component instantiation
-            // since dynamic options merging is pretty slow, and none of the
-            // internal component options needs special treatment.
-            initInternalComponent(vm, options)
-        } else {
-            // 不是通过Vue.component()创建的 那就需要处理传入的options对象进行处理
-            // 如 通过混合策略 驼峰命名处理 各种属性多方式传值统一处理
-            vm.$options = mergeOptions(
-                resolveConstructorOptions(vm.constructor),
-                options || {},
-                vm
-            )
-        }
-        /* istanbul ignore else */
-        if (process.env.NODE_ENV !== 'production') {
-            initProxy(vm)
-        } else {
-            vm._renderProxy = vm
-        }
-        // expose real self
-        vm._self = vm
-
-        initLifecycle(vm)
-        initEvents(vm)
-        initRender(vm)
-        // 触发beforeCreate回调
-        callHook(vm, 'beforeCreate')
-        // 初始化高阶属性inject
-        initInjections(vm) // resolve injections before data/props
-        initState(vm)
-        // 初始化高阶属性 provide
-        initProvide(vm) // resolve provide after data/props
-        callHook(vm, 'created')
-
-        /* istanbul ignore if */
-        if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
-            vm._name = formatComponentName(vm, false)
-            mark(endTag)
-            measure(`vue ${vm._name} init`, startTag, endTag)
-        }
-
-        if (vm.$options.el) {
-            vm.$mount(vm.$options.el)
-        }
+Vue.prototype._init = function(options ? : Object) {
+    // vm -> this;
+    const vm: Component = this
+    // 我们初始化一个_uid 作为 Vue的唯一ID
+    vm._uid = uid++
+        // 进行性能测试
+        let startTag, endTag
+    /* istanbul ignore if */
+    if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+        startTag = `vue-perf-start:${vm._uid}`
+        endTag = `vue-perf-end:${vm._uid}`
+        mark(startTag)
     }
+    // 
+    // a flag to avoid this being observed
+    // 表明Vue是Vue对象
+    vm._isVue = true
+    // merge options
+    // 在Vue中我们生成组件其实有两种方式 new Vue() Vue.component()
+    // 如果是Vue.component() 则在执行Vue的静态方法Vue之后会在Option中添加一个属性_isComponent表明这是一个组件
+    if (options && options._isComponent) {
+        // optimize internal component instantiation
+        // since dynamic options merging is pretty slow, and none of the
+        // internal component options needs special treatment.
+        initInternalComponent(vm, options)
+    } else {
+        // 不是通过Vue.component()创建的 那就需要处理传入的options对象进行处理
+        // 如 通过混合策略 驼峰命名处理 各种属性多方式传值统一处理
+        vm.$options = mergeOptions(
+            resolveConstructorOptions(vm.constructor),
+            options || {},
+            vm
+        )
+    }
+    /* istanbul ignore else */
+    if (process.env.NODE_ENV !== 'production') {
+        initProxy(vm)
+    } else {
+        vm._renderProxy = vm
+    }
+    // expose real self
+    vm._self = vm
+    initLifecycle(vm)
+    initEvents(vm)
+    initRender(vm)
+    // 触发beforeCreate回调
+    callHook(vm, 'beforeCreate')
+    // 初始化高阶属性inject
+    initInjections(vm) // resolve injections before data/props
+    initState(vm)
+    // 初始化高阶属性 provide
+    initProvide(vm) // resolve provide after data/props
+    callHook(vm, 'created')
+    /* istanbul ignore if */
+    if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+        vm._name = formatComponentName(vm, false)
+        mark(endTag)
+        measure(`vue ${vm._name} init`, startTag, endTag)
+    }
+
+    // 对于子组件类型 其都不会通过el去绑定 模板DOM。而对于跟组件其会el:'#app' 所以需要触发 vm.$mount()方法。
+    // 子组件在什么时候触发 $mount方法？  在init 钩子函数 最后调用 child.$mount
+    if (vm.$options.el) {
+        vm.$mount(vm.$options.el)
+    }
+}
 }
 
 export function initInternalComponent(vm: Component, options: InternalComponentOptions) {

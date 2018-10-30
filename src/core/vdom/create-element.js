@@ -133,6 +133,7 @@ export function _createElement(
                 config.parsePlatformTagName(tag), data, children,
                 undefined, undefined, context
             )
+            
             // 如果不是内置元素节点  但是 跟 组件名称匹配 就调用创建组件方法
             //   h('el-button',{},[])
             //   获取 子组件 是否在 components：{} 属性中定义其依赖

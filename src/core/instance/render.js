@@ -74,6 +74,7 @@ export function renderMixin(Vue: Class < Component > ) {
     Vue.prototype._render = function(): VNode {
         // 第一次 vm = new Vue()
         const vm: Component = this
+        
         // render 用户自定义 或者webpack编译 options生成的render函数
         // _parentVnode ？？？？？
         const { render, _parentVnode } = vm.$options
