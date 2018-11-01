@@ -146,9 +146,11 @@ export function lifecycleMixin(Vue: Class < Component > ) {
         }
         // call the last hook...
         vm._isDestroyed = true
-            // invoke destroy hooks on current rendered tree
+
+        // invoke destroy hooks on current rendered tree
         vm.__patch__(vm._vnode, null)
-            // fire destroyed hook
+
+        // fire destroyed hook
         callHook(vm, 'destroyed')
             // turn off all instance listeners.
         vm.$off()

@@ -9,38 +9,127 @@
 <body>
     <div id="app">
         <h3>APP</h3>
-        <div>
-            <div>第一行</div>
-            <div>第二行</div>
-        </div>
-        <button-counter></button-counter>  
+        <button @click="handleClickShowSecond">showSecond</button>
+        <yz-second v-if="isShowSecond"></yz-second>
     </div>
 </body>
+<script type="text/x-template" id="second">
+    <div id="second-wrapper">
+      <button @click="handleClickShowThree">showThree</button>
+      <yz-three v-if="isShowThree">
+        <span>放在组件slot内的</span>
+        <yz-children></yz-children>
+      </yz-three>
+  </div>
+</script>
+<script type="text/x-template" id="three">
+    <div id="three-wrapper">
+      this is three
+      <slot></slot>
+      <yz-four>
+          <yz-fourchildren></yz-fourchildren>
+      </yz-four>
+  </div>
+</script>
+<script type="text/x-template" id="children">
+    <div id="children-wrapper">
+      this is children
+  </div>
+</script>
+<script type="text/x-template" id="four">
+<div id="children-wrapper">
+    this is children
+    <slot></slot>
+</div>
+</script>
 <script type="text/javascript" src="./vue.js"></script>
 <script type="text/javascript">
-var buttonCounter =  Vue.component('button-counter', {
-  data: function () {
-    return {
-      count: 0
+var yzFour = Vue.component('yz-four', {
+    name: 'yzFour',
+    template: '#four',
+    beforeDestroy: function() {
+        console.log('yzFour beforeDestroy')
+    },
+    destroyed: function() {
+        console.log('yzFour destroyed')
     }
-  },
-  template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>',
-  mounted:function(){
-    console.log(this);
-  }
 })
-var vue = new Vue({
-    el: "#app",
-    components:{
-        buttonCounter
+var yzFourchildren = Vue.component('yz-fourchildren', {
+    name: 'yzFourchildren',
+    template: '#children',
+    beforeDestroy: function() {
+        console.log('yzFourchildren beforeDestroy')
+    },
+    destroyed: function() {
+        console.log('yzFourchildren destroyed')
+    }
+})
+var yzThree = Vue.component('yz-three', {
+    name: 'yzThree',
+    components: {
+        yzFour,
+        yzFourchildren
+    },
+    template: '#three',
+    beforeDestroy: function() {
+        console.log('yzThree beforeDestroy')
+    },
+    destroyed: function() {
+        console.log('yzThree destroyed')
+    }
+})
+var yzChildren = Vue.component('yz-children', {
+    name: 'yzChildren',
+    template: '#children',
+    beforeDestroy: function() {
+        console.log('yzChildren beforeDestroy')
+    },
+    destroyed: function() {
+        console.log('yzChildren destroyed')
+    }
+
+})
+var yzSecond = Vue.component('yz-second', {
+    name: 'yzSecond',
+    components: {
+        yzThree,
+        yzChildren
     },
     data: function() {
         return {
-            name: ""
+            isShowThree: true
         }
+    },
+    template: '#second',
+    methods: {
+        handleClickShowThree() {
+            this.isShowThree = !this.isShowThree;
+        }
+    },
+    beforeDestroy: function() {
+        console.log('yzSecond beforeDestroy')
+    },
+    destroyed: function() {
+        console.log('yzSecond destroyed')
     }
 })
 
+var vue = new Vue({
+    el: "#app",
+    components: {
+        yzSecond
+    },
+    data: function() {
+        return {
+            isShowSecond: true
+        }
+    },
+    methods: {
+        handleClickShowSecond() {
+            this.isShowSecond = !this.isShowSecond;
+        }
+    },
+})
 </script>
 
 </html>

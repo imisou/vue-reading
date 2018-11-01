@@ -249,9 +249,8 @@ export function createPatchFunction(backend) {
         }
         // 是否是嵌套的内部组件
         vnode.isRootInsert = !nested // for transition enter check
-
-        // 如果为true 说明 此当前处理的vnode是一个组件
-        // 如果是undefined 说明当前处理的vnode为元素节点
+            // 如果为true 说明 此当前处理的vnode是一个组件
+            // 如果是undefined 说明当前处理的vnode为元素节点
         if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
             return
         }
@@ -286,7 +285,6 @@ export function createPatchFunction(backend) {
             vnode.elm = vnode.ns ?
                 nodeOps.createElementNS(vnode.ns, tag) :
                 nodeOps.createElement(tag, vnode)
-                
             setScope(vnode)
                 /* istanbul ignore if */
             if (__WEEX__) {
@@ -343,8 +341,7 @@ export function createPatchFunction(backend) {
         let i = vnode.data
         if (isDef(i)) {
             const isReactivated = isDef(vnode.componentInstance) && i.keepAlive
-
-            // 在create-component.js 中
+                // 在create-component.js 中
             if (isDef(i = i.hook) && isDef(i = i.init)) {
                 i(vnode, false /* hydrating */ )
             }
@@ -522,29 +519,77 @@ export function createPatchFunction(backend) {
 
     /**
      * 调用组件卸载的钩子函数  data.hook.destroy
-     * @author guzhanghua
+     *   这是一个深度遍历的过程，在从某个父节点卸载开始，其总会触发节点的 cbs.destory方法。
+     *   如果此节点是一个组件的占位符节点，那么他就会触发 i(vnode) 调用组件实例$destory,
+     *      然后对子组件的组件vnode进行深度遍历； 这些做完 那么isDef(i = vnode.children) 
+     *  
+     * 注 : 占位符vnode下存储的 子节点在什么时候触发 destroy (如 下面yz-second 中 yz-three下的 yz-children)
+    <div id="second-wrapper">
+      <button @click="handleClickShowThree">showThree</button>
+      <yz-three v-if="isShowThree">
+        <span>放在组件slot内的</span>
+        <yz-children></yz-children>
+      </yz-three>
+    </div>
+    // -----------------------------
+    <div id="three-wrapper">
+      this is three
+      <slot></slot>
+      <yz-four>
+          <yz-fourchildren></yz-fourchildren>
+      </yz-four>
+    </div>
+    所以对于上面 组件的卸载触发是 
+        先是 yz-three 的 beforeDestroy()
+            yz-four  的 beforeDestroy()
+            yz-four  的 destroyed()
+            yz-fourchildren  的 beforeDestroy()
+            yz-fourchildren  的 destroyed()
+            yz-children   的 beforeDestroy()
+            yz-children   的 destroyed()
+            yz-three 的 destroyed()
+           
+        然后如果 
+
+
+
      * @param {*} vnode
      */
     function invokeDestroyHook(vnode) {
         let i, j
         const data = vnode.data
+
         if (isDef(data)) {
+            // 调用占位符vnode的 data.hook的destory钩子函数
             if (isDef(i = data.hook) && isDef(i = i.destroy)) i(vnode)
+
+            // 调用cbs.destory 的属性处理函数 如： destroy(),unbindDirectives()
             for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode)
         }
+        // 深度遍历处理占位符vnode中的 子组件的卸载
         if (isDef(i = vnode.children)) {
             for (j = 0; j < vnode.children.length; ++j) {
                 invokeDestroyHook(vnode.children[j])
             }
         }
     }
-
+    /**
+     * 在 updateChildren  的时候 如果需要删除某一个子节点，这时候就会触发 removeVnodes
+     * @param {*} parentElm                // 父vnode.elm
+     * @param {*} vnodes                   // 当前 updateChildren 子节点数组
+     * @param {*} startIdx                 // 在旧的vnode中 当前移除vnode 的下标
+     * @param {*} endIdx                   // 需要移除的vnode 的length
+     */
     function removeVnodes(parentElm, vnodes, startIdx, endIdx) {
         for (; startIdx <= endIdx; ++startIdx) {
             const ch = vnodes[startIdx]
             if (isDef(ch)) {
+                //  如果 存在 tag元素 说明这是不是一个文本vnode
                 if (isDef(ch.tag)) {
+                    // 移除vnode上定义的 事件、cbs
                     removeAndInvokeRemoveHook(ch)
+
+                    // 调用组件vnode 的 data.hook.destory 钩子函数进行组件的卸载
                     invokeDestroyHook(ch)
                 } else { // Text node
                     removeNode(ch.elm)
@@ -1053,12 +1098,10 @@ export function createPatchFunction(backend) {
             if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
             return
         }
-
         let isInitialPatch = false
         const insertedVnodeQueue = []
-
-        // 如果没有真实的 DOM 那么 就可能是 一开始创建的时候  或者 懒加载的组件类型
-        // 那么 直接调用createEle 生成DOM
+            // 如果没有真实的 DOM 那么 就可能是 一开始创建的时候  或者 懒加载的组件类型
+            // 那么 直接调用createEle 生成DOM
         if (isUndef(oldVnode)) {
             // empty mount (likely as component), create new root element
             isInitialPatch = true
@@ -1096,23 +1139,20 @@ export function createPatchFunction(backend) {
                     // create an empty node and replace it
                     oldVnode = emptyNodeAt(oldVnode)
                 }
-
                 // replacing existing element
                 const oldElm = oldVnode.elm
                 const parentElm = nodeOps.parentNode(oldElm)
-
-                // create new node
+                    // create new node
                 createElm(
-                    vnode, // 当前的组件vnode
-                    insertedVnodeQueue,
-                    // extremely rare edge case: do not insert if old element is in a
-                    // leaving transition. Only happens when combining transition +
-                    // keep-alive + HOCs. (#4590)
-                    oldElm._leaveCb ? null : parentElm, // 父元素
-                    nodeOps.nextSibling(oldElm)
-                )
-
-                // update parent placeholder node element, recursively
+                        vnode, // 当前的组件vnode
+                        insertedVnodeQueue,
+                        // extremely rare edge case: do not insert if old element is in a
+                        // leaving transition. Only happens when combining transition +
+                        // keep-alive + HOCs. (#4590)
+                        oldElm._leaveCb ? null : parentElm, // 父元素
+                        nodeOps.nextSibling(oldElm)
+                    )
+                    // update parent placeholder node element, recursively
                 if (isDef(vnode.parent)) {
                     let ancestor = vnode.parent
                     const patchable = isPatchable(vnode)
@@ -1141,7 +1181,6 @@ export function createPatchFunction(backend) {
                         ancestor = ancestor.parent
                     }
                 }
-
                 // destroy old node
                 if (isDef(parentElm)) {
                     removeVnodes(parentElm, [oldVnode], 0, 0)

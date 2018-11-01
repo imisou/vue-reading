@@ -2697,6 +2697,8 @@
 
         Vue.prototype.$destroy = function() {
             var vm = this;
+            // console.log(this.$options.name);
+            debugger;
             if (vm._isBeingDestroyed) {
                 return
             }
@@ -5773,6 +5775,8 @@
         }
 
         function invokeDestroyHook(vnode) {
+            var a = vnode.elm;
+            debugger;
             var i, j;
             var data = vnode.data;
             if (isDef(data)) {
