@@ -2657,7 +2657,7 @@
     function lifecycleMixin(Vue) {
         Vue.prototype._update = function(vnode, hydrating) {
             var vm = this;
-             debugger;
+
             var prevEl = vm.$el;
             var prevVnode = vm._vnode;
             var prevActiveInstance = activeInstance;
@@ -2698,7 +2698,7 @@
         Vue.prototype.$destroy = function() {
             var vm = this;
             // console.log(this.$options.name);
-            debugger;
+    
             if (vm._isBeingDestroyed) {
                 return
             }
@@ -5776,7 +5776,7 @@
 
         function invokeDestroyHook(vnode) {
             var a = vnode.elm;
-            debugger;
+  
             var i, j;
             var data = vnode.data;
             if (isDef(data)) {
@@ -6123,7 +6123,7 @@
         }
 
         return function patch(oldVnode, vnode, hydrating, removeOnly) {   
-              debugger;   
+      
             if (isUndef(vnode)) {
                 if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
                 return
@@ -7678,6 +7678,7 @@
     /*  */
 
     function enter(vnode, toggleDisplay) {
+        
         var el = vnode.elm;
 
         // call leave callback now
@@ -7690,7 +7691,7 @@
         if (isUndef(data)) {
             return
         }
-
+        debugger;
         /* istanbul ignore if */
         if (isDef(el._enterCb) || el.nodeType !== 1) {
             return
@@ -8296,6 +8297,7 @@
         abstract: true,
 
         render: function render(h) {
+            debugger;
             var this$1 = this;
 
             var children = this.$slots.default;

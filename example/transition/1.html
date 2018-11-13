@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+
+<body>
+    <div id="app">
+
+    </div>
+</body>
+<script type="text/javascript" src="../vue.js"></script>
+<script type="text/javascript">
+    var vue = new Vue({
+        name: "App",
+        el: "#app",
+        data: function() {
+            return {
+                show: true
+            }
+        },
+        template: '<div id="demo">' +
+            '<button v-on:click="show = !show">' +
+            'Toggle' +
+            '</button>' +
+            '<transition :appear="true" name="fade">' +
+            '<p v-if="show">hello</p>' +
+            '</transition>' +
+            '</div>',
+    })
+</script>
+
+</html>

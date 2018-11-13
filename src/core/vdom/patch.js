@@ -548,10 +548,6 @@ export function createPatchFunction(backend) {
             yz-children   的 beforeDestroy()
             yz-children   的 destroyed()
             yz-three 的 destroyed()
-           
-        然后如果 
-
-
 
      * @param {*} vnode
      */
@@ -917,8 +913,8 @@ export function createPatchFunction(backend) {
 
                 // 如果是旧的vnode 存在子节点  而新的vnode 不存在 那么应该是 删除子节点
             } else if (isDef(oldCh)) {
-                removeVnodes(elm, oldCh, 0, oldCh.length - 1)
-                    //如果都没有子节点 上面判断新的vnode 不是 文本节点，那么就是旧的是文本节点 那就直接设置text = '';
+                removeVnodes(elm, oldCh, 0, oldCh.length - 1);
+                //如果都没有子节点 上面判断新的vnode 不是 文本节点，那么就是旧的是文本节点 那就直接设置text = '';
             } else if (isDef(oldVnode.text)) {
                 nodeOps.setTextContent(elm, '')
             }
@@ -944,11 +940,11 @@ export function createPatchFunction(backend) {
         }
     }
 
-    let hydrationBailed = false
-        // list of modules that can skip create hook during hydration because they
-        // are already rendered on the client or has no need for initialization
-        // Note: style is excluded because it relies on initial clone for future
-        // deep updates (#7063).
+    let hydrationBailed = false;
+    // list of modules that can skip create hook during hydration because they
+    // are already rendered on the client or has no need for initialization
+    // Note: style is excluded because it relies on initial clone for future
+    // deep updates (#7063).
     const isRenderedModule = makeMap('attrs,class,staticClass,staticStyle,key')
 
     // Note: this is a browser-only function so we can assume elms are DOM nodes.
