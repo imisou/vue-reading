@@ -120,6 +120,8 @@ export function enter(vnode: VNodeWithData, toggleDisplay: ? () => void) {
     // 判断是否使用CSS过渡类
     const expectsCSS = css !== false && !isIE9
 
+    //  获取我们 钩子函数 enter  appear 中的参数长度。 如果大于1， 即存在 done入参 手动控制 cb回调
+    //  不然需要在动画 或者 enter 钩子执行完 就执行cb 进入下一步
     const userWantsControl = getHookArgumentsLength(enterHook)
 
 
@@ -186,15 +188,17 @@ export function enter(vnode: VNodeWithData, toggleDisplay: ? () => void) {
         nextFrame(() => {
             // 移除元素的显示动画属性
             removeTransitionClass(el, startClass)
-            // 如果在 enter() 执行 done() 那么就表示动画完成钩子函数
+            // 如果 没有手动定义 done 钩子回到函数。那么这时候需要我们去 判断在css动画执行完 自动执行cb 回调
             if (!cb.cancelled) {
                 // 添加动画执行完成CSS过渡属性   fade-in-enter-to
                 addTransitionClass(el, toClass)
 
                 if (!userWantsControl) {
+                    // 如果定义了 duration 延迟属性 那么这时候就不需要通过事件的方式去 获取动画执行完成时间。而是在延迟时间后执行cb
                     if (isValidDuration(explicitEnterDuration)) {
                         setTimeout(cb, explicitEnterDuration)
                     } else {
+                        // 没有延迟、 没有 done钩子回调；这时候 就需要通过 事件的方式去获取动画完成时间
                         whenTransitionEnds(el, type, cb)
                     }
                 }
@@ -350,9 +354,6 @@ function isValidDuration(val) {
 
 /**
  * 规范化转换钩子的参数长度
- * @author guzhanghua
- * @param {Function} fn
- * @returns {boolean}
  */
 function getHookArgumentsLength(fn: Function): boolean {
     if (isUndef(fn)) {

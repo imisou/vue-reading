@@ -85,6 +85,14 @@ export function removeTransitionClass(el: any, cls: string) {
     removeClass(el, cls)
 }
 
+/**
+ * type - string，指定过渡事件类型，侦听过渡何时结束。
+ * 有效值为 "transition" 和 "animation"。默认 Vue.js 将自动检测出持续时间长的为过渡事件类型。
+ * @param {Element} el                  动画css 绑定的元素
+ * @param {? string} expectedType       过渡动画 事件类型  "transition" 和 "animation"
+ * @param {Function} cb                 动画事件完成执行的回调
+ * @returns
+ */
 export function whenTransitionEnds(
     el: Element,
     expectedType: ? string,
@@ -122,7 +130,9 @@ export function getTransitionInfo(el: Element, expectedType ? : ? string) : {
     hasTransform: boolean;
 } {
     const styles: any = window.getComputedStyle(el)
-    const transitionDelays: Array < string > = styles[transitionProp + 'Delay'].split(', ')
+    //  获取 style 上设置的  transitionDelay 属性的值  (过渡效果何时开始)
+    const transitionDelays: Array < string > = styles[transitionProp + 'Delay'].split(', ');
+    //  获取 style 上设置的  transitionDuration 属性的值  (完成过渡效果需要花费的时间)
     const transitionDurations: Array < string > = styles[transitionProp + 'Duration'].split(', ')
     const transitionTimeout: number = getTimeout(transitionDelays, transitionDurations)
     const animationDelays: Array < string > = styles[animationProp + 'Delay'].split(', ')

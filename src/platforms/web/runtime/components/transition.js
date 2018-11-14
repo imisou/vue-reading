@@ -40,9 +40,15 @@ function getRealChild(vnode: ? VNode): ? VNode {
     }
 }
 
+/*
+    处理 transition 组件上定义的属性和事件
+
+    如  :css appear name ...
+    事件   @before-enter @enter @after-enter @enter-cancelled
+ */
 export function extractTransitionData(comp: Component) : Object {
     const data = {}
-    const options: ComponentOptions = comp.$options
+    const options: ComponentOptions = comp.$options;
         // props
     for (const key in options.propsData) {
         data[key] = comp[key]
@@ -168,8 +174,9 @@ export default {
             (String(child.key).indexOf(id) === 0 ? child.key : id + child.key) :
             child.key
 
+
         // 获取 transition 组件上的 props 和 事件，然后保存在vnode.data.transition 上。
-        // 然后在 patch 处理 \platforms\web\runtime\modules\transition.js
+        // 然后在 patch 处理 \platforms\web\runtime\modules\transition.js 中,就可以通过
         const data: Object = (child.data || (child.data = {})).transition = extractTransitionData(this)
         const oldRawChild: VNode = this._vnode
         const oldChild: VNode = getRealChild(oldRawChild)
