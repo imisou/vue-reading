@@ -4,6 +4,7 @@
 
 首先我们先看一下Vue option有哪些属性？
 
+```
 Vue
  ├── el
  ├── name
@@ -34,6 +35,7 @@ Vue
  ├── activated
  ├── beforeDestroyed
  └── destroyed
+ ```
  
 那我们定义一个组件的时候一般会这样使用
 
