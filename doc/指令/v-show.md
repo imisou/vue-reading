@@ -28,7 +28,7 @@ ast = {
 
 ### generate阶段
 
-在 AST转表达式字符串阶段 
+在 AST转表达式字符串阶段
 
 ```js
 /**
@@ -40,9 +40,9 @@ ast = {
     rawName: "v-demo:foo.a.b"        // 指令实际属性名称
     value: "fnDirective"             // 指令的值
   }]
- * 
- * @param {*} el 
- * @param {*} state 
+ *
+ * @param {*} el
+ * @param {*} state
  */
 function genDirectives(el: ASTElement, state: CodegenState): string | void {
     const dirs = el.directives
@@ -52,7 +52,7 @@ function genDirectives(el: ASTElement, state: CodegenState): string | void {
         // 获取每一各指令
         dir = dirs[i]
         needRuntime = true
-       
+
         const gen: DirectiveFunction = state.directives[dir.name]
         // 如果是内置的指令  如 v-model
         if (gen) {
@@ -83,22 +83,22 @@ function genDirectives(el: ASTElement, state: CodegenState): string | void {
 
 ```js
 _c(
-    "div",
-    {
-        directives: [
-            {
-                name: "show",
-                rawName: "v-show",
-                value: isShow,
-                expression: "isShow"
-            }
-        ]
-    },
-    [_v("isShow")]
+	"div",
+	{
+		directives: [
+			{
+				name: "show",
+				rawName: "v-show",
+				value: isShow,
+				expression: "isShow"
+			}
+		]
+	},
+	[_v("isShow")]
 )
 ```
 
-## 
+##
 
 ## 总结 ：
 

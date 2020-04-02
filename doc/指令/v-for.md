@@ -21,7 +21,7 @@
 ```js
 /**
  * 处理节点上的 v-for 属性
- * @param {*} el 
+ * @param {*} el
  */
 export function processFor(el: ASTElement) {
     let exp
@@ -48,12 +48,12 @@ export function processFor(el: ASTElement) {
  *    exp = '(item,index) in arr'
  *      返回一个v-for 解析后的对象
  *    res = {
- *        for       : 'arr'    ,      // 指向v-for 绑定的对象 
+ *        for       : 'arr'    ,      // 指向v-for 绑定的对象
  *        alias     : 'item'   ,      // 遍历的第一个参数   item
  *        iterator1 : 'index'   ,     // 如果存在第二个参数就获取第二个参数   index
  *        iterator2 : 'key'   ,       // 如果存在第三个参数就获取第三个参数   key
  *    }
- * @param {*} exp 
+ * @param {*} exp
  */
 export function parseFor(exp: string): ? ForParseResult {
     // '(item,index) in arr'
@@ -108,8 +108,8 @@ genFor(el, state)
 
 /**
     处理 v-for 节点
- * @param {*} el 
- * @param {*} state 
+ * @param {*} el
+ * @param {*} state
  */
 export function genFor(
     el: any,
@@ -151,9 +151,9 @@ export function genFor(
 
 ```js
 _l(object1, function(val, key, index) {
-    return _c("div", { key: key }, [
-        _c("p", [_v(_s(val + "---" + key + " --- " + index))])
-    ])
+	return _c("div", { key: key }, [
+		_c("p", [_v(_s(val + "---" + key + " --- " + index))])
+	])
 })
 
 _l(遍历的参数 ,回调函数function(alias , iterator1 , iterator2 ){})
@@ -161,7 +161,7 @@ _l(遍历的参数 ,回调函数function(alias , iterator1 , iterator2 ){})
 
 #### 注意:
 
-###### 1. 对于 非组件占位符节点、slot节点、template节点 需要添加 :key 
+###### 1. 对于 非组件占位符节点、slot节点、template节点 需要添加 :key
 
 ## render编译阶段
 
@@ -173,16 +173,16 @@ _l(遍历的参数 ,回调函数function(alias , iterator1 , iterator2 ){})
 /**
 
 _l(object1, function(val, key, index) {
-    return _c("div", { key: key }, [
-        _c("p", [_v(_s(val + "---" + key + " --- " + index))])
-    ])
+	return _c("div", { key: key }, [
+		_c("p", [_v(_s(val + "---" + key + " --- " + index))])
+	])
 })
 
 在 v-for 中 参数可以为 Array | Object | number | string
 
 
  * @param {*} val  我们定义的  v-for="item in arr" 中的 arr
- * @param {*} render 
+ * @param {*} render
  */
 export function renderList(
     val: any,
@@ -224,17 +224,3 @@ export function renderList(
     return ret
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-

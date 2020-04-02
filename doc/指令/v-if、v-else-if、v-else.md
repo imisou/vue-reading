@@ -26,11 +26,11 @@ processIf(element)
 
 /**
  * 处理 AST 上的 v-if , v-else , v-else-if 三个属性
- * 
+ *
     <div v-if="testIf === '1'">if</div>
     <div v-else-if="testIf === '2'">v-else-if</div>
     <div v-else>else</div>
- * @param {c} el 
+ * @param {c} el
  */
 function processIf(el) {
     // 获取 ast.attrsMap['v-if']的值 并从ast.attrsList 中移除v-if属性
@@ -59,9 +59,9 @@ function processIf(el) {
 }
 ```
 
-判断节点上是否存在静态属性  v-if 
+判断节点上是否存在静态属性  v-if
 
-- 不存在v-if 判断是否存在 v-else | v-else-if 
+- 不存在v-if 判断是否存在 v-else | v-else-if
 - 如果存在v-if 属性  
 
 设置el.if 保存属性条件
@@ -124,12 +124,12 @@ if (element.elseif || element.else) {
         // span 的父节点  也就指向 div
         element.parent = currentParent
     }
-    我们发现element.elseif || element.else 没有进行 currentParent.children.push(element) 
+    我们发现element.elseif || element.else 没有进行 currentParent.children.push(element)
     那就是说对于 v-if..else 3个节点来说其在AST上只是一个节点(v-if) 其其他节点 都存放在 el.ifConditions = [数组中]
 
     el(v-if).ifConditions = [
-        { exp : 'testIf === 0' , block : el(v-if) } , 
-        { exp : 'testIf === 1' , block : el(v-else-if) } , 
+        { exp : 'testIf === 0' , block : el(v-if) } ,
+        { exp : 'testIf === 1' , block : el(v-else-if) } ,
         { exp : undefined , block : el(v-else) }
     ]
  * @author guzhanghua
@@ -228,7 +228,7 @@ function markStatic(node: ASTNode) {
 
         // 处理节点为 v-if v-else-if v-else的兄弟节点
         // 因为此节点 其几个节点都存放在 node(v-if).ifConditions属性上，
-        // 所以此处遍历 如果子节点有一个不是静态节点，那么父节点就不是静态节点 
+        // 所以此处遍历 如果子节点有一个不是静态节点，那么父节点就不是静态节点
         if (node.ifConditions) {
             for (let i = 1, l = node.ifConditions.length; i < l; i++) {
                 const block = node.ifConditions[i].block
@@ -283,10 +283,10 @@ export function genIf(
      block : 节点2
  }]
    然后通过三目运算符   ( exp1 ) ? 节点1 : 待确定 去不断的遍历 el.ifConditions数组
- * @param {*} conditions 
- * @param {*} state 
- * @param {*} altGen 
- * @param {*} altEmpty 
+ * @param {*} conditions
+ * @param {*} state
+ * @param {*} altGen
+ * @param {*} altEmpty
  */
 function genIfConditions(
     conditions: ASTIfConditions,
@@ -302,7 +302,7 @@ function genIfConditions(
     if (condition.exp) {
         // "(testIf === 1)?_c('div',{staticClass:"v-if"},[_v("if")]):_e()"
         // 通过三目运算符
-        // 第一个 ( exp ) ? 节点1 : 
+        // 第一个 ( exp ) ? 节点1 :
         // 判断第二个是否存在  
         //   如果不存在 return '_e()'  => ( exp ) ? 节点1 : '_e()'
         //   如果第二个存在 且仍有 exp 说明是 v-else-if ： return ( exp2 ) ? 节点2 : 待确定  
@@ -339,10 +339,6 @@ function genIfConditions(
 ```
 
 
-### 重点: 
+### 重点:
 
 #### 1. v-if 与 v-show的区别
-
-
-
-

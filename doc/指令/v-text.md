@@ -34,7 +34,7 @@ ast = {
 
 ### generate阶段
 
-在 AST转表达式字符串阶段 
+在 AST转表达式字符串阶段
 
 ```js
 /**
@@ -46,9 +46,9 @@ ast = {
     rawName: "v-demo:foo.a.b"        // 指令实际属性名称
     value: "fnDirective"             // 指令的值
   }]
- * 
- * @param {*} el 
- * @param {*} state 
+ *
+ * @param {*} el
+ * @param {*} state
  */
 function genDirectives(el: ASTElement, state: CodegenState): string | void {
     const dirs = el.directives
@@ -58,7 +58,7 @@ function genDirectives(el: ASTElement, state: CodegenState): string | void {
         // 获取每一各指令
         dir = dirs[i]
         needRuntime = true
-       
+
         const gen: DirectiveFunction = state.directives[dir.name]
         // 如果是内置的指令  如 v-model
         if (gen) {
@@ -103,20 +103,20 @@ import { addProp } from 'compiler/helpers'
   其处理方法 ：
 
   _c("div", { domProps: { textContent: _s(name) } }, [
-        _v(_s(value)),
-        _c("p", [_v(_s(value))])
+		_v(_s(value)),
+		_c("p", [_v(_s(value))])
   ])
-  
-  发现其就是当做 
+
+  发现其就是当做
     <div v-bind:text-content.prop='name'>{{value}}<p>{{value}}</p></div>
 
- * @param {*} el 
- * @param {*} dir 
+ * @param {*} el
+ * @param {*} dir
  */
 export default function text (el: ASTElement, dir: ASTDirective) {
   // 如果存在 v-text="value"
   if (dir.value) {
-    // 按照 prop进行处理 
+    // 按照 prop进行处理
     addProp(el, 'textContent', `_s(${dir.value})`)
   }
 }
